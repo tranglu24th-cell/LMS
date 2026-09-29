@@ -1,0 +1,943 @@
+﻿@{
+    ViewBag.Title = "Quản lý điểm";
+
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+
+    var students = ViewBag.Students as IEnumerable<dynamic>;
+    var courses = ViewBag.Courses as IEnumerable<dynamic>;
+}
+
+<div class="card">
+
+    <div class="card-header">
+
+        <h1 class="card-title">
+            @ViewBag.Title
+        </h1>
+
+    </div>
+
+    <div class="card-body table-responsive">
+
+        <div class="row mb-3">
+
+            <div class="col-md-4">
+                <label>Lọc theo khóa học</label>
+
+                <select id="filterCourse" class="form-control">
+                    <option value="">-- Tất cả khóa học --</option>
+
+                    @if (courses != null)
+                    {
+                        foreach (var c in courses)
+                        {
+                            <option value="@c.Id">
+                                @c.Title
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label>Lọc theo MSSV</label>
+
+                <input type="text"
+                       id="filterMssv"
+                       class="form-control"
+                       placeholder="Nhập MSSV..." />
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+
+                <button type="button"
+                        id="btnFilter"
+                        class="btn btn-secondary">
+
+                    <i class="fas fa-filter mr-1"></i>
+                    Lọc
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <table id="items"
+               class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+
+                    <th style="width: 10px">#</th>
+
+                    <th>MSSV</th>
+
+                    <th>Sinh viên</th>
+
+                    <th>Khóa học</th>
+
+                    <th style="width: 70px">CC</th>
+
+                    <th style="width: 70px">GK</th>
+
+                    <th style="width: 70px">CK</th>
+
+                    <th style="width: 70px">TB</th>
+
+                    <th>Nhận xét</th>
+
+                    <th>Ngày chấm</th>
+
+                    <th style="width: 40px">Hành động</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     MODAL THÊM / SỬA ĐIỂM
+========================================== -->
+
+<div class="modal fade" id="modal-default">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">
+                    Quản lý điểm
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+
+                    <span aria-hidden="true">&times;</span>
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <form id="Item">
+
+                    <input type="hidden"
+                           id="Id"
+                           name="Id" />
+
+
+                    <!-- SINH VIÊN -->
+
+                    <div class="form-group">
+
+                        <label for="StudentId">
+                            Sinh viên
+                        </label>
+
+                        <select class="form-control"
+                                id="StudentId"
+                                name="StudentId">
+
+                            <option value="">
+                                -- Chọn sinh viên --
+                            </option>
+
+                            @if (students != null)
+                            {
+                                foreach (var s in students)
+                                {
+                                    <option value="@s.Id">
+                                        @s.MSSV - @s.FullName
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- KHÓA HỌC -->
+
+                    <div class="form-group">
+
+                        <label for="CourseId">
+                            Khóa học
+                        </label>
+
+                        <select class="form-control"
+                                id="CourseId"
+                                name="CourseId">
+
+                            <option value="">
+                                -- Chọn khóa học --
+                            </option>
+
+                            @if (courses != null)
+                            {
+                                foreach (var c in courses)
+                                {
+                                    <option value="@c.Id">
+                                        @c.Title
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ĐIỂM CC -->
+
+                    <div class="form-group">
+
+                        <label for="CC">
+                            Điểm chuyên cần (10%)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               id="CC"
+                               name="CC"
+                               step="0.1"
+                               min="0"
+                               max="10"
+                               value="0" />
+
+                    </div>
+
+
+                    <!-- ĐIỂM GK -->
+
+                    <div class="form-group">
+
+                        <label for="GK">
+                            Điểm giữa kỳ (30%)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               id="GK"
+                               name="GK"
+                               step="0.1"
+                               min="0"
+                               max="10"
+                               value="0" />
+
+                    </div>
+
+
+                    <!-- ĐIỂM CK -->
+
+                    <div class="form-group">
+
+                        <label for="CK">
+                            Điểm cuối kỳ (60%)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               id="CK"
+                               name="CK"
+                               step="0.1"
+                               min="0"
+                               max="10"
+                               value="0" />
+
+                    </div>
+
+
+                    <!-- ĐIỂM TỔNG -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Điểm tổng kết
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="Score"
+                               readonly />
+
+                    </div>
+
+
+                    <!-- NHẬN XÉT -->
+
+                    <div class="form-group">
+
+                        <label for="Comment">
+                            Nhận xét
+                        </label>
+
+                        <textarea class="form-control"
+                                  id="Comment"
+                                  name="Comment"
+                                  rows="3"></textarea>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div class="modal-footer justify-content-between">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Đóng
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary btnSave">
+
+                    Lưu
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Css {
+
+    <link href="/plugins/datatables-bs4/css/datatables.bootstrap4.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/toastr/toastr.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/sweetalert2/sweetalert2.min.css"
+          rel="stylesheet" />
+
+    <style>
+
+        div.dt-buttons {
+            float: right;
+        }
+
+        #items th,
+        #items td {
+            vertical-align: middle;
+        }
+
+    </style>
+}
+
+
+@section Js {
+
+    <script src="/plugins/datatables/jquery.datatables.min.js"></script>
+
+    <script src="/plugins/datatables-bs4/js/datatables.bootstrap4.min.js"></script>
+
+    <script src="/plugins/datatables-buttons/js/datatables.buttons.min.js"></script>
+
+    <script src="/plugins/toastr/toastr.min.js"></script>
+
+    <script src="/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+
+
+    <script>
+
+        $(function () {
+
+            // ==========================================
+            // HÀM TÍNH ĐIỂM TỔNG KẾT
+            // CC 10% + GK 30% + CK 60%
+            // ==========================================
+
+            function calculateScore() {
+
+                var cc = parseFloat($("#CC").val()) || 0;
+
+                var gk = parseFloat($("#GK").val()) || 0;
+
+                var ck = parseFloat($("#CK").val()) || 0;
+
+                var score =
+                    cc * 0.10 +
+                    gk * 0.30 +
+                    ck * 0.60;
+
+                $("#Score").val(score.toFixed(1));
+            }
+
+
+            $("#CC, #GK, #CK").on("input", function () {
+
+                calculateScore();
+
+            });
+
+
+            // ==========================================
+            // DATATABLE
+            // ==========================================
+
+            var items = $("#items").DataTable({
+
+                "dom": 'Blfrtip',
+
+                "processing": true,
+
+                "serverSide": true,
+
+
+                "ajax": {
+
+                    "url": "/Admin/Grade/getList",
+
+                    "data": function (d) {
+
+                        d.courseId =
+                            $("#filterCourse").val();
+
+                        d.mssv =
+                            $("#filterMssv").val();
+
+                    },
+
+                    "type": "POST",
+
+                    "dataType": "json",
+
+
+                    "error": function () {
+
+                        toastr.error(
+                            "Lỗi: Không thể tải danh sách điểm."
+                        );
+
+                    }
+
+                },
+
+
+                "columns": [
+
+                    // STT
+
+                    {
+                        "data": null,
+
+                        "render": function (
+                            data,
+                            type,
+                            row,
+                            meta
+                        ) {
+
+                            return meta.row + 1;
+
+                        }
+
+                    },
+
+
+                    // MSSV
+
+                    {
+                        "data": "mssv"
+                    },
+
+
+                    // SINH VIÊN
+
+                    {
+                        "data": "fullName"
+                    },
+
+
+                    // KHÓA HỌC
+
+                    {
+                        "data": "courseTitle"
+                    },
+
+
+                    // CC
+
+                    {
+                        "data": "cc",
+
+                        "render": function (data) {
+
+                            var score =
+                                parseFloat(data) || 0;
+
+                            return score.toFixed(1);
+
+                        }
+
+                    },
+
+
+                    // GK
+
+                    {
+                        "data": "gk",
+
+                        "render": function (data) {
+
+                            var score =
+                                parseFloat(data) || 0;
+
+                            return score.toFixed(1);
+
+                        }
+
+                    },
+
+
+                    // CK
+
+                    {
+                        "data": "ck",
+
+                        "render": function (data) {
+
+                            var score =
+                                parseFloat(data) || 0;
+
+                            return score.toFixed(1);
+
+                        }
+
+                    },
+
+
+                    // TB
+
+                    {
+                        "data": "tb",
+
+                        "render": function (data) {
+
+                            var score =
+                                parseFloat(data) || 0;
+
+                            var cls =
+                                score >= 8
+                                    ? "badge-success"
+                                    : (
+                                        score >= 5
+                                            ? "badge-warning"
+                                            : "badge-danger"
+                                    );
+
+                            return '<span class="badge ' +
+                                cls +
+                                '">' +
+                                score.toFixed(1) +
+                                '</span>';
+
+                        }
+
+                    },
+
+
+                    // NHẬN XÉT
+
+                    {
+                        "data": "comment",
+
+                        "render": function (data) {
+
+                            return data
+                                ? data
+                                : '<span class="text-muted">-</span>';
+
+                        }
+
+                    },
+
+
+                    // NGÀY CHẤM
+
+                    {
+                        "data": "gradedAt"
+                    },
+
+
+                    // HÀNH ĐỘNG
+
+                    {
+
+                        "render": function (
+                            data,
+                            type,
+                            row
+                        ) {
+
+                            return (
+
+                                '<div class="btn-group">' +
+
+                                '<a href="#" ' +
+                                'data-toggle="dropdown" ' +
+                                'class="list-icons-item text-dark">' +
+
+                                '<i class="fas fa-sort-amount-down"></i>' +
+
+                                '</a>' +
+
+                                '<div class="dropdown-menu" role="menu">' +
+
+                                '<a class="dropdown-item text-primary btnEdit" ' +
+                                'href="#" ' +
+                                'data-id="' +
+                                row.id +
+                                '">' +
+
+                                '<i class="fas fa-pencil-alt mr-3"></i>' +
+                                'Cập nhật' +
+
+                                '</a>' +
+
+                                '<a class="dropdown-item text-danger btnDelete" ' +
+                                'href="#" ' +
+                                'data-id="' +
+                                row.id +
+                                '">' +
+
+                                '<i class="fas fa-trash mr-3"></i>' +
+                                'Xóa' +
+
+                                '</a>' +
+
+                                '</div>' +
+
+                                '</div>'
+
+                            );
+
+                        }
+
+                    }
+
+                ],
+
+
+                // ==========================================
+                // NÚT THÊM ĐIỂM
+                // ==========================================
+
+                "buttons": [
+
+                    {
+
+                        text:
+                            '<i class="fa fa-plus mr-2"></i>Thêm điểm',
+
+                        className:
+                            'btn btn-info pb-1',
+
+
+                        action: function () {
+
+                            $("#modal-default form#Item")[0].reset();
+
+                            $("#Id").val("");
+
+                            $("#Score").val("0.0");
+
+                            $("#modal-default").modal('show');
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
+
+            // ==========================================
+            // LỌC
+            // ==========================================
+
+            $("#btnFilter").on(
+                "click",
+                function () {
+
+                    items.ajax.reload();
+
+                }
+            );
+
+
+            // ==========================================
+            // SỬA ĐIỂM
+            // ==========================================
+
+            $(document).on(
+                "click",
+                "a.btnEdit",
+                function () {
+
+                    let id =
+                        $(this).data("id");
+
+
+                    $.getJSON(
+                        "/Admin/Grade/getItem",
+                        {
+                            id: id
+                        },
+
+                        function (item) {
+
+                            $("#Id").val(item.id);
+
+                            $("#StudentId")
+                                .val(item.studentId);
+
+                            $("#CourseId")
+                                .val(item.courseId);
+
+                            $("#CC")
+                                .val(item.cc);
+
+                            $("#GK")
+                                .val(item.gk);
+
+                            $("#CK")
+                                .val(item.ck);
+
+                            $("#Comment")
+                                .val(item.comment);
+
+                            calculateScore();
+
+                            $("#modal-default")
+                                .modal('show');
+
+                        }
+
+                    ).fail(function () {
+
+                        toastr.error(
+                            "Không thể lấy thông tin điểm."
+                        );
+
+                    });
+
+                }
+            );
+
+
+            // ==========================================
+            // LƯU ĐIỂM
+            // ==========================================
+
+            $(".btnSave").on(
+                "click",
+                function () {
+
+                    if (!$("#StudentId").val()) {
+
+                        toastr.error(
+                            "Vui lòng chọn sinh viên."
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (!$("#CourseId").val()) {
+
+                        toastr.error(
+                            "Vui lòng chọn khóa học."
+                        );
+
+                        return;
+
+                    }
+
+
+                    var cc =
+                        parseFloat($("#CC").val()) || 0;
+
+                    var gk =
+                        parseFloat($("#GK").val()) || 0;
+
+                    var ck =
+                        parseFloat($("#CK").val()) || 0;
+
+
+                    if (
+                        cc < 0 || cc > 10 ||
+                        gk < 0 || gk > 10 ||
+                        ck < 0 || ck > 10
+                    ) {
+
+                        toastr.error(
+                            "Điểm phải nằm trong khoảng từ 0 đến 10."
+                        );
+
+                        return;
+
+                    }
+
+
+                    $.ajax({
+
+                        data:
+                            $("#Item").serialize(),
+
+                        url:
+                            "/Admin/Grade/Save",
+
+                        type:
+                            "POST",
+
+                        contentType:
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+
+
+                        success: function () {
+
+                            $("#modal-default")
+                                .modal('hide');
+
+                            toastr.success(
+                                "Lưu điểm thành công!"
+                            );
+
+                            items.ajax.reload();
+
+                        },
+
+
+                        error: function (xhr) {
+
+                            var msg =
+                                xhr.responseText ||
+                                "Không thể lưu điểm.";
+
+                            toastr.error(msg);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            // ==========================================
+            // XÓA ĐIỂM
+            // ==========================================
+
+            $(document).on(
+                "click",
+                "a.btnDelete",
+                function () {
+
+                    let id =
+                        $(this).data("id");
+
+
+                    Swal.fire({
+
+                        title:
+                            "Bạn chắc không?",
+
+                        text:
+                            "Xóa không thể phục hồi được!",
+
+                        showCancelButton:
+                            true,
+
+                        confirmButtonColor:
+                            "#d33",
+
+                        cancelButtonColor:
+                            "#3085d6",
+
+                        confirmButtonText:
+                            "Xác nhận",
+
+                        cancelButtonText:
+                            "Hủy"
+
+                    }).then(function (result) {
+
+                        if (result.isConfirmed) {
+
+                            $.get(
+                                "/Admin/Grade/Delete",
+                                {
+                                    id: id
+                                },
+
+                                function (data) {
+
+                                    if (data == true) {
+
+                                        toastr.success(
+                                            "Xóa điểm thành công."
+                                        );
+
+                                        items.ajax.reload();
+
+                                    }
+                                    else {
+
+                                        toastr.error(
+                                            "Không thể xóa điểm."
+                                        );
+
+                                    }
+
+                                }
+
+                            ).fail(function () {
+
+                                toastr.error(
+                                    "Không thể xóa điểm."
+                                );
+
+                            });
+
+                        }
+
+                    });
+
+                }
+            );
+
+        });
+
+    </script>
+}

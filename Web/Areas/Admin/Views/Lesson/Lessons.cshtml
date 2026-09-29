@@ -1,0 +1,855 @@
+﻿@model int
+
+@{
+    var course = ViewBag.Course as Web.Models.EF.Course;
+
+    ViewBag.Title = "Bài học: " + (course?.Title ?? "");
+
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+
+<div class="card">
+
+    <!-- ========================================== -->
+    <!-- HEADER -->
+    <!-- ========================================== -->
+
+    <div class="card-header">
+
+        <h1 class="card-title">
+            @ViewBag.Title
+        </h1>
+
+        <a href="@Url.Action("Index", "Lesson", new { area = "Admin" })"
+           class="float-right">
+            &larr; Quay lại danh sách khóa học
+        </a>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TABLE -->
+    <!-- ========================================== -->
+
+    <div class="card-body table-responsive">
+
+        <table id="items"
+               class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+
+                    <th style="width: 10px">
+                        #
+                    </th>
+
+                    <th>
+                        Chương
+                    </th>
+
+                    <th>
+                        Loại bài
+                    </th>
+
+                    <th>
+                        Tiêu đề bài học
+                    </th>
+
+                    <th style="width: 90px">
+                        Thứ tự
+                    </th>
+
+                    <th>
+                        Ngày tạo
+                    </th>
+
+                    <th style="width: 40px">
+                        Hành động
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODAL THÊM / SỬA BÀI HỌC -->
+<!-- ===================================================== -->
+
+<div class="modal fade"
+     id="modal-default">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header">
+
+                <h4 class="modal-title">
+
+                    Thêm / Cập nhật bài học
+
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+
+                    <span aria-hidden="true">
+                        &times;
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <form id="Item">
+
+                    <!-- ID -->
+                    <input type="hidden"
+                           id="Id"
+                           name="Id" />
+
+
+                    <!-- COURSE ID -->
+                    <input type="hidden"
+                           id="CourseId"
+                           name="CourseId"
+                           value="@Model" />
+
+
+                    <!-- ================================= -->
+                    <!-- CHƯƠNG -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="ChapterName">
+
+                            Chương
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="ChapterName"
+                               name="ChapterName"
+                               placeholder="Ví dụ: Chương 1 - Tổng quan" />
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- THỨ TỰ CHƯƠNG -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="ChapterOrder">
+
+                            Thứ tự chương
+
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               id="ChapterOrder"
+                               name="ChapterOrder"
+                               value="1"
+                               min="1" />
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- LOẠI BÀI -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="LessonType">
+
+                            Loại bài học
+
+                        </label>
+
+                        <select class="form-control"
+                                id="LessonType"
+                                name="LessonType">
+
+                            <option value="Lecture / Lý thuyết">
+                                Lecture / Lý thuyết
+                            </option>
+
+                            <option value="Video">
+                                Video
+                            </option>
+
+                            <option value="Tài liệu">
+                                Tài liệu
+                            </option>
+
+                            <option value="Bài tập">
+                                Bài tập
+                            </option>
+
+                            <option value="Quiz">
+                                Quiz
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- TÊN BÀI -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="Title">
+
+                            Tiêu đề bài học
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="Title"
+                               name="Title"
+                               placeholder="Nhập tiêu đề bài học" />
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- NỘI DUNG -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="Content">
+
+                            Nội dung bài học
+
+                        </label>
+
+                        <textarea class="form-control"
+                                  id="Content"
+                                  name="Content"
+                                  rows="8"
+                                  placeholder="Nhập nội dung bài học"></textarea>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- THỨ TỰ BÀI -->
+                    <!-- ================================= -->
+
+                    <div class="form-group">
+
+                        <label for="OrderNumber">
+
+                            Thứ tự bài học
+
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               id="OrderNumber"
+                               name="OrderNumber"
+                               value="1"
+                               min="1" />
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <div class="modal-footer justify-content-between">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Đóng
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary btnSave">
+
+                    <i class="fas fa-save"></i>
+
+                    Lưu
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Css {
+
+    <link href="/plugins/datatables-bs4/css/datatables.bootstrap4.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/toastr/toastr.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/sweetalert2/sweetalert2.min.css"
+          rel="stylesheet" />
+
+    <style>
+
+        div.dt-buttons {
+            float: right;
+        }
+
+    </style>
+
+}
+
+
+@section Js {
+
+    <script src="/plugins/datatables/jquery.datatables.min.js"></script>
+
+    <script src="/plugins/datatables-bs4/js/datatables.bootstrap4.min.js"></script>
+
+    <script src="/plugins/datatables-buttons/js/datatables.buttons.min.js"></script>
+
+    <script src="/plugins/toastr/toastr.min.js"></script>
+
+    <script src="/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+
+
+    <script>
+
+        $(function () {
+
+            var courseId = @Model;
+
+
+            // ==========================================
+            // DATATABLE
+            // ==========================================
+
+            var items = $("#items").DataTable({
+
+                "dom": 'Blfrtip',
+
+                "processing": true,
+
+                "serverSide": true,
+
+
+                "ajax": {
+
+                    "url": "/Admin/Lesson/getList",
+
+                    "data": {
+                        courseId: courseId
+                    },
+
+                    "type": "POST",
+
+                    "dataType": "json",
+
+
+                    "error": function () {
+
+                        toastr.error(
+                            "Không thể tải danh sách bài học."
+                        );
+
+                    }
+
+                },
+
+
+                "columns": [
+
+                    // STT
+                    {
+                        "data": null,
+
+                        "render": function (
+                            data,
+                            type,
+                            row,
+                            meta
+                        ) {
+
+                            return meta.row + 1;
+
+                        }
+
+                    },
+
+
+                    // CHƯƠNG
+                    {
+                        "data": "chapterName",
+
+                        "render": function (
+                            data,
+                            type,
+                            row
+                        ) {
+
+                            if (!data) {
+
+                                return '<span class="text-muted">Chưa có chương</span>';
+
+                            }
+
+                            return `
+                                <span class="badge badge-primary">
+                                    Chương ${row.chapterOrder || 1}
+                                </span>
+                                <br>
+                                <strong>
+                                    ${data}
+                                </strong>
+                            `;
+
+                        }
+
+                    },
+
+
+                    // LOẠI BÀI
+                    {
+                        "data": "lessonType",
+
+                        "render": function (
+                            data,
+                            type,
+                            row
+                        ) {
+
+                            return data || "Lecture / Lý thuyết";
+
+                        }
+
+                    },
+
+
+                    // TIÊU ĐỀ
+                    {
+                        "data": "title"
+                    },
+
+
+                    // THỨ TỰ
+                    {
+                        "data": "orderNumber"
+                    },
+
+
+                    // NGÀY TẠO
+                    {
+                        "data": "createdAt"
+                    },
+
+
+                    // HÀNH ĐỘNG
+                    {
+
+                        "render": function (
+                            data,
+                            type,
+                            row
+                        ) {
+
+                            let tool =
+
+                                '<div class="btn-group">' +
+
+                                '<a href="#" ' +
+                                'data-toggle="dropdown" ' +
+                                'class="list-icons-item text-dark">' +
+
+                                '<i class="fas fa-sort-amount-down"></i>' +
+
+                                '</a>' +
+
+                                '<div class="dropdown-menu" role="menu">' +
+
+
+                                '<a class="dropdown-item text-primary btnEdit" ' +
+                                'href="#" ' +
+                                'data-id="' + row.id + '">' +
+
+                                '<i class="fas fa-pencil-alt mr-3"></i>' +
+                                'Cập nhật' +
+
+                                '</a>' +
+
+
+                                '<a class="dropdown-item text-danger btnDelete" ' +
+                                'href="#" ' +
+                                'data-id="' + row.id + '">' +
+
+                                '<i class="fas fa-trash mr-3"></i>' +
+                                'Xóa' +
+
+                                '</a>' +
+
+                                '</div>' +
+
+                                '</div>';
+
+
+                            return tool;
+
+                        }
+
+                    }
+
+                ],
+
+
+                // ==========================================
+                // NÚT THÊM
+                // ==========================================
+
+                "buttons": [
+
+                    {
+
+                        text:
+                            '<i class="fa fa-plus mr-2"></i>Thêm bài học',
+
+                        className:
+                            'btn btn-info pb-1',
+
+
+                        action: function () {
+
+                            // Reset form
+                            $("#Item")[0].reset();
+
+
+                            // Giá trị mặc định
+                            $("#Id").val("");
+
+                            $("#CourseId")
+                                .val(courseId);
+
+                            $("#ChapterName")
+                                .val("");
+
+                            $("#ChapterOrder")
+                                .val(1);
+
+                            $("#LessonType")
+                                .val("Lecture / Lý thuyết");
+
+                            $("#OrderNumber")
+                                .val(1);
+
+
+                            // Mở modal
+                            $("#modal-default")
+                                .modal('show');
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
+
+
+            // ==========================================
+            // SỬA BÀI HỌC
+            // ==========================================
+
+            $(document).on(
+                "click",
+                "a.btnEdit",
+                function () {
+
+                    let id = $(this).data("id");
+
+
+                    $.getJSON(
+                        "/Admin/Lesson/getItem",
+                        {
+                            id: id
+                        },
+
+                        function (item) {
+
+                            $("#Id")
+                                .val(item.id);
+
+                            $("#CourseId")
+                                .val(item.courseId);
+
+
+                            // CHƯƠNG
+                            $("#ChapterName")
+                                .val(item.chapterName || "");
+
+
+                            $("#ChapterOrder")
+                                .val(item.chapterOrder || 1);
+
+
+                            // LOẠI BÀI
+                            $("#LessonType")
+                                .val(
+                                    item.lessonType ||
+                                    "Lecture / Lý thuyết"
+                                );
+
+
+                            // TÊN
+                            $("#Title")
+                                .val(item.title || "");
+
+
+                            // NỘI DUNG
+                            $("#Content")
+                                .val(item.content || "");
+
+
+                            // THỨ TỰ
+                            $("#OrderNumber")
+                                .val(item.orderNumber || 1);
+
+
+                            $("#modal-default")
+                                .modal('show');
+
+                        }
+
+                    ).fail(function () {
+
+                        toastr.error(
+                            "Không thể lấy thông tin bài học."
+                        );
+
+                    });
+
+                }
+            );
+
+
+
+            // ==========================================
+            // LƯU BÀI HỌC
+            // ==========================================
+
+            $(".btnSave").on(
+                "click",
+                function () {
+
+                    // Kiểm tra tiêu đề
+                    if (!$("#Title").val().trim()) {
+
+                        toastr.error(
+                            "Tiêu đề bài học không được để trống."
+                        );
+
+                        return;
+
+                    }
+
+
+                    // Kiểm tra chương
+                    if (!$("#ChapterName").val().trim()) {
+
+                        toastr.error(
+                            "Tên chương không được để trống."
+                        );
+
+                        return;
+
+                    }
+
+
+                    $.ajax({
+
+                        data:
+                            $("#Item").serialize(),
+
+                        url:
+                            "/Admin/Lesson/Save",
+
+                        type:
+                            "POST",
+
+                        contentType:
+                            "application/x-www-form-urlencoded; charset=UTF-8",
+
+
+                        success: function () {
+
+                            $("#modal-default")
+                                .modal('hide');
+
+
+                            toastr.success(
+                                "Lưu bài học thành công!"
+                            );
+
+
+                            items.ajax.reload(
+                                null,
+                                false
+                            );
+
+                        },
+
+
+                        error: function (xhr) {
+
+                            var message =
+                                "Không thể lưu dữ liệu bài học.";
+
+                            if (
+                                xhr.responseJSON &&
+                                xhr.responseJSON.message
+                            ) {
+
+                                message =
+                                    xhr.responseJSON.message;
+
+                            }
+
+
+                            toastr.error(message);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+
+            // ==========================================
+            // XÓA BÀI HỌC
+            // ==========================================
+
+            $(document).on(
+                "click",
+                "a.btnDelete",
+                function () {
+
+                    let id = $(this).data("id");
+
+
+                    Swal.fire({
+
+                        title: "Bạn chắc không?",
+
+                        text:
+                            "Xóa không thể phục hồi được!",
+
+                        icon:
+                            "warning",
+
+                        showCancelButton: true,
+
+                        confirmButtonColor:
+                            "#d33",
+
+                        cancelButtonColor:
+                            "#3085d6",
+
+                        confirmButtonText:
+                            "Xác nhận",
+
+                        cancelButtonText:
+                            "Hủy"
+
+                    }).then(function (result) {
+
+                        if (result.isConfirmed) {
+
+                            $.get(
+                                "/Admin/Lesson/Delete",
+                                {
+                                    id: id
+                                },
+
+                                function (data) {
+
+                                    if (data == true) {
+
+                                        toastr.success(
+                                            "Xóa bài học thành công."
+                                        );
+
+                                        items.ajax.reload(
+                                            null,
+                                            false
+                                        );
+
+                                    }
+                                    else {
+
+                                        toastr.error(
+                                            "Không thể xóa bài học."
+                                        );
+
+                                    }
+
+                                }
+
+                            ).fail(function () {
+
+                                toastr.error(
+                                    "Không thể xóa bài học."
+                                );
+
+                            });
+
+                        }
+
+                    });
+
+                }
+            );
+
+        });
+
+    </script>
+
+}

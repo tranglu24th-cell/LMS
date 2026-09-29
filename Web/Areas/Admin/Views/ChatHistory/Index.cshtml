@@ -1,0 +1,108 @@
+﻿@model List<Web.Models.EF.ChatConversation>
+@{
+    ViewBag.Title = "Lịch sử hội thoại AI";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark" style="font-weight: 600;">Lịch sử hội thoại AI</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Lịch sử hội thoại AI</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="icon fas fa-check-circle mr-2"></i> @TempData["Message"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="card">
+                <div class="card-body text-center text-muted py-4">
+                    Chưa có cuộc hội thoại nào giữa sinh viên và Trợ giảng AI.
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var conv in Model)
+            {
+                var collapseId = "chat-" + conv.Id;
+                <div class="card mt-2">
+                    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #fff;">
+                        <h3 class="card-title text-primary font-weight-bold m-0">
+                            <i class="fas fa-comments mr-2"></i>
+                            @(conv.User != null ? conv.User.FullName : "(Không rõ)")
+                            <span class="badge badge-secondary ml-1">@(conv.User != null ? conv.User.MSSV : "")</span>
+                            @if (!string.IsNullOrWhiteSpace(conv.Title))
+                            {
+                                <span class="text-muted font-weight-normal ml-2" style="font-size: 14px;">— @conv.Title</span>
+                            }
+                        </h3>
+                        <div class="text-right">
+                            <div class="text-muted" style="font-size: 12px;">
+                                <i class="far fa-clock"></i> @conv.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                            <span class="badge badge-info">@conv.Messages.Count tin nhắn</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body py-2">
+                        <a data-toggle="collapse" href="#@collapseId" role="button" class="btn btn-sm btn-outline-primary mb-2">
+                            <i class="fas fa-eye mr-1"></i> Xem / ẩn nội dung hội thoại
+                        </a>
+
+                        <div class="collapse" id="@collapseId">
+                            <div class="chat-thread p-2 mb-2" style="max-height: 350px; overflow-y: auto; background: #f8f9fa; border-radius: 6px;">
+                                @foreach (var msg in conv.Messages)
+                                {
+                                    bool isUser = msg.Role == "user";
+                                    <div class="d-flex mb-2 @(isUser ? "justify-content-end" : "justify-content-start")">
+                                        <div class="p-2" style="max-width: 75%; border-radius: 8px; white-space: pre-wrap; font-size: 13px; background: @(isUser ? "#d1e7ff" : "#ffffff"); border: 1px solid #e2e2e2;">
+                                            <div class="text-muted font-weight-bold" style="font-size: 11px;">
+                                                @(isUser ? "Sinh viên" : "Trợ giảng AI") · @msg.CreatedAt.ToString("HH:mm dd/MM")
+                                            </div>
+                                            @msg.Content
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <form action="/Admin/ChatHistory/SaveNote" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="conversationId" value="@conv.Id" />
+                            <label class="text-secondary font-weight-bold mb-1" style="font-size: 13px;">
+                                <i class="fas fa-sticky-note mr-1"></i> Ghi chú của giảng viên
+                            </label>
+                            <div class="form-group mb-1">
+                                <textarea name="teacherNote" class="form-control form-control-sm" rows="2" maxlength="1000" placeholder="Nhận xét về cuộc hội thoại này (ví dụ: sinh viên còn nhầm lẫn khái niệm X, cần ôn lại bài Y...)">@conv.TeacherNote</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm px-3 font-weight-bold">
+                                <i class="fas fa-save mr-1"></i> Lưu ghi chú
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+</section>

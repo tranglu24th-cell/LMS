@@ -1,0 +1,464 @@
+﻿@using Web.Models.EF
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Nhập điểm";
+
+    var courses = ViewBag.Courses as List<Course> ?? new List<Course>();
+    var course = ViewBag.Course as Course;
+    var students = ViewBag.Students as List<User> ?? new List<User>();
+    var grades = ViewBag.Grades as List<Grade> ?? new List<Grade>();
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Nhập điểm</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 35px auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+        }
+
+            .header h1 {
+                margin: 0;
+                color: #2563eb;
+            }
+
+        .course-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+        }
+
+            .course-box select {
+                width: 100%;
+                padding: 12px;
+                margin-top: 8px;
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
+                font-size: 15px;
+            }
+
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+        }
+
+            .score-table th {
+                background: #2563eb;
+                color: white;
+                padding: 13px 8px;
+                text-align: center;
+            }
+
+            .score-table td {
+                padding: 10px 8px;
+                border-bottom: 1px solid #e2e8f0;
+                text-align: center;
+            }
+
+                .score-table td:nth-child(2),
+                .score-table td:nth-child(3) {
+                    text-align: left;
+                }
+
+        .score-input {
+            width: 65px;
+            padding: 7px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .auto-score {
+            font-weight: bold;
+        }
+
+        .letter {
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-back {
+            background: #64748b;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .bottom {
+            margin-top: 20px;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>Nhập điểm sinh viên</h1>
+            <p>Giảng viên nhập điểm thành phần cho sinh viên</p>
+        </div>
+
+        <!-- CHỌN KHÓA HỌC -->
+
+        <div class="course-box">
+
+            <form method="get"
+                  asp-controller="Learning"
+                  asp-action="EnterGrades">
+
+                <label>
+                    <strong>Chọn khóa học</strong>
+                </label>
+
+                <select name="courseId"
+                        onchange="this.form.submit()">
+
+                    <option value="">
+                        -- Chọn khóa học --
+                    </option>
+
+                    @foreach (var item in courses)
+                    {
+                        if (course != null && item.Id == course.Id)
+                        {
+                            <option value="@item.Id" selected>
+                                @item.Title
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">
+                                @item.Title
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </form>
+
+        </div>
+
+
+        @if (course != null)
+        {
+            if (students.Count == 0)
+            {
+                <div class="empty">
+                    <h3>Chưa có sinh viên</h3>
+                    <p>Khóa học này chưa có sinh viên đăng ký.</p>
+                </div>
+            }
+            else
+            {
+                <form method="post"
+                      asp-controller="Learning"
+                      asp-action="SaveGrades">
+
+                    <input type="hidden"
+                           name="courseId"
+                           value="@course.Id" />
+
+                    <table class="score-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>STT</th>
+                                <th>Sinh viên</th>
+                                <th>MSSV</th>
+
+                                <th>
+                                    CC
+                                    <br />
+                                    (10%)
+                                </th>
+
+                                <th>
+                                    GK
+                                    <br />
+                                    (30%)
+                                </th>
+
+                                <th>
+                                    CK
+                                    <br />
+                                    (60%)
+                                </th>
+
+                                <th>
+                                    TB
+                                </th>
+
+                                <th>
+                                    ĐIỂM 4
+                                </th>
+
+                                <th>
+                                    LOẠI
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @{
+                                int stt = 1;
+                            }
+
+                            @foreach (var student in students)
+                            {
+                                var grade = grades.FirstOrDefault(
+                                g => g.StudentId == student.Id
+                                );
+
+                                var cc = grade?.CC ?? 0;
+                                var gk = grade?.GK ?? 0;
+                                var ck = grade?.CK ?? 0;
+
+                                var tb = cc * 0.1 + gk * 0.3 + ck * 0.6;
+
+                                var score4 =
+                                tb >= 8.5 ? 4 :
+                                tb >= 7.0 ? 3 :
+                                tb >= 5.5 ? 2 :
+                                tb >= 4.0 ? 1 : 0;
+
+                                var letter =
+                                tb >= 8.5 ? "A" :
+                                tb >= 7.0 ? "B" :
+                                tb >= 5.5 ? "C" :
+                                tb >= 4.0 ? "D" : "F";
+
+                                <tr>
+
+                                    <td>
+                                        @stt
+                                    </td>
+
+                                    <td>
+                                        @student.FullName
+                                    </td>
+
+                                    <td>
+                                        @student.MSSV
+                                    </td>
+
+                                    <!-- CC -->
+
+                                    <td>
+                                        <input type="number"
+                                               name="CC_@student.Id"
+                                               value="@(grade == null ? "" : grade.CC.ToString("0.0"))"
+                                               min="0"
+                                               max="10"
+                                               step="0.1"
+                                               class="score-input component-score"
+                                               data-student="@student.Id"
+                                               data-type="cc" />
+                                    </td>
+
+                                    <!-- GK -->
+
+                                    <td>
+                                        <input type="number"
+                                               name="GK_@student.Id"
+                                               value="@(grade == null ? "" : grade.GK.ToString("0.0"))"
+                                               min="0"
+                                               max="10"
+                                               step="0.1"
+                                               class="score-input component-score"
+                                               data-student="@student.Id"
+                                               data-type="gk" />
+                                    </td>
+
+                                    <!-- CK -->
+
+                                    <td>
+                                        <input type="number"
+                                               name="CK_@student.Id"
+                                               value="@(grade == null ? "" : grade.CK.ToString("0.0"))"
+                                               min="0"
+                                               max="10"
+                                               step="0.1"
+                                               class="score-input component-score"
+                                               data-student="@student.Id"
+                                               data-type="ck" />
+                                    </td>
+
+                                    <!-- TB TỰ TÍNH -->
+
+                                    <td class="auto-score"
+                                        id="tb_@student.Id">
+                                        @(grade == null ? "-" : tb.ToString("0.0"))
+                                    </td>
+
+                                    <!-- ĐIỂM 4 TỰ TÍNH -->
+
+                                    <td class="auto-score"
+                                        id="score4_@student.Id">
+                                        @(grade == null ? "-" : score4.ToString())
+                                    </td>
+
+                                    <!-- LOẠI TỰ TÍNH -->
+
+                                    <td class="letter"
+                                        id="letter_@student.Id">
+                                        @(grade == null ? "-" : letter)
+                                    </td>
+
+                                </tr>
+
+                                stt++;
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                    <div class="bottom">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Lưu điểm
+                        </button>
+
+                        <a asp-controller="Learning"
+                           asp-action="LookupScore"
+                           class="btn btn-back">
+                            Quay lại
+                        </a>
+
+                    </div>
+
+                </form>
+            }
+        }
+        else
+        {
+            <div class="empty">
+                <h3>Chưa chọn khóa học</h3>
+                <p>Vui lòng chọn khóa học để nhập điểm.</p>
+            </div>
+        }
+
+    </div>
+
+
+    <script>
+
+        // TỰ ĐỘNG TÍNH ĐIỂM KHI GIẢNG VIÊN NHẬP
+
+        document.querySelectorAll(".component-score").forEach(input => {
+
+            input.addEventListener("input", function () {
+
+                const studentId = this.dataset.student;
+
+                const ccInput = document.querySelector(
+                    `[data-student="${studentId}"][data-type="cc"]`
+                );
+
+                const gkInput = document.querySelector(
+                    `[data-student="${studentId}"][data-type="gk"]`
+                );
+
+                const ckInput = document.querySelector(
+                    `[data-student="${studentId}"][data-type="ck"]`
+                );
+
+                const cc = parseFloat(ccInput.value) || 0;
+                const gk = parseFloat(gkInput.value) || 0;
+                const ck = parseFloat(ckInput.value) || 0;
+
+                const tb =
+                    cc * 0.10 +
+                    gk * 0.30 +
+                    ck * 0.60;
+
+                let score4 = 0;
+                let letter = "F";
+
+                if (tb >= 8.5) {
+                    score4 = 4;
+                    letter = "A";
+                }
+                else if (tb >= 7.0) {
+                    score4 = 3;
+                    letter = "B";
+                }
+                else if (tb >= 5.5) {
+                    score4 = 2;
+                    letter = "C";
+                }
+                else if (tb >= 4.0) {
+                    score4 = 1;
+                    letter = "D";
+                }
+
+                document.getElementById("tb_" + studentId)
+                    .innerText = tb.toFixed(1);
+
+                document.getElementById("score4_" + studentId)
+                    .innerText = score4;
+
+                document.getElementById("letter_" + studentId)
+                    .innerText = letter;
+
+            });
+
+        });
+
+    </script>
+
+</body>
+</html>

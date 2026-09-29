@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark" style="font-weight: 600;">Trang Quản Trị</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nội dung hiển thị các ô thống kê -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Hộp 1: Khóa học (Màu Xanh Dương) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalCourses</h3>
+                        <p>Khóa Học</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Lesson", new { area = "Admin" })" class="small-box-footer">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hộp 2: Sinh viên / Học viên (Màu Xanh Lá) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalStudents</h3>
+                        <p>Học Viên</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Student", new { area = "Admin" })" class="small-box-footer">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hộp 3: Giảng viên (Màu Vàng) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner" style="color: #fff !important;">
+                        <h3 style="color: #fff !important;">@ViewBag.TotalTeachers</h3>
+                        <p style="color: #fff !important;">Giảng Viên</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Course", new { area = "Admin" })" class="small-box-footer" style="color: #fff !important;">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right" style="color: #fff !important;"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hộp 4: Phản hồi & Liên hệ (Màu Đỏ) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalContacts</h3>
+                        <p>Phản Hồi & Liên Hệ</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Contact", new { area = "Admin" })" class="small-box-footer">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

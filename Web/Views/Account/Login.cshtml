@@ -1,0 +1,863 @@
+﻿@model Web.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_Site.cshtml";
+}
+
+<div class="lms-login-page">
+
+    <div class="lms-login-container">
+
+        <!-- PHẦN BÊN TRÁI -->
+        <div class="lms-login-left">
+
+            <div class="lms-brand">
+                <div class="lms-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+
+                <div>
+                    <div class="lms-brand-name">LMS</div>
+                    <div class="lms-brand-sub">
+                        Learning Management System
+                    </div>
+                </div>
+            </div>
+
+            <div class="lms-left-content">
+
+                <span class="lms-badge">
+                    <i class="fas fa-book-open me-2"></i>
+                    HỆ THỐNG HỌC TẬP
+                </span>
+
+                <h1>
+                    Chào mừng bạn<br />
+                    <span>quay trở lại!</span>
+                </h1>
+
+                <p>
+                    Đăng nhập để truy cập các khóa học,
+                    bài học và theo dõi kết quả học tập của bạn.
+                </p>
+
+                <div class="lms-features">
+
+                    <div class="lms-feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+
+                        <div>
+                            <strong>Khóa học trực tuyến</strong>
+                            <small>Học tập mọi lúc, mọi nơi</small>
+                        </div>
+                    </div>
+
+                    <div class="lms-feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+
+                        <div>
+                            <strong>Theo dõi kết quả</strong>
+                            <small>Quản lý tiến độ học tập</small>
+                        </div>
+                    </div>
+
+                    <div class="lms-feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+
+                        <div>
+                            <strong>Trợ lý AI</strong>
+                            <small>Hỗ trợ giải đáp kiến thức</small>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="lms-left-footer">
+                © 2026 LMS - Hệ thống quản lý học tập
+            </div>
+
+        </div>
+
+
+        <!-- PHẦN BÊN PHẢI -->
+        <div class="lms-login-right">
+
+            <div class="lms-form-wrapper">
+
+                <div class="lms-mobile-logo">
+                    <div class="lms-mobile-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                </div>
+
+                <div class="lms-form-header">
+
+                    <h2>Đăng nhập</h2>
+
+                    <p>
+                        Đăng nhập vào tài khoản của bạn
+                    </p>
+
+                </div>
+
+
+                <!-- THÔNG BÁO LỖI -->
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger lms-alert">
+                </div>
+
+
+                <form asp-action="Login"
+                      asp-controller="Account"
+                      method="post">
+
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+
+                    <!-- EMAIL / USERNAME -->
+                    <div class="lms-form-group">
+
+                        <label asp-for="Email">
+                            Email hoặc tên đăng nhập
+                        </label>
+
+                        <div class="lms-input">
+
+                            <i class="fas fa-user"></i>
+
+                            <input asp-for="Email"
+                                   placeholder="Nhập email hoặc tên đăng nhập"
+                                   autocomplete="username" />
+
+                        </div>
+
+                        <span asp-validation-for="Email"
+                              class="text-danger lms-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- MẬT KHẨU -->
+                    <div class="lms-form-group">
+
+                        <div class="lms-password-label">
+
+                            <label asp-for="Password">
+                                Mật khẩu
+                            </label>
+
+                        </div>
+
+                        <div class="lms-input">
+
+                            <i class="fas fa-lock"></i>
+
+                            <input asp-for="Password"
+                                   type="password"
+                                   placeholder="Nhập mật khẩu"
+                                   autocomplete="current-password" />
+
+                            <button type="button"
+                                    class="lms-show-password"
+                                    onclick="togglePassword()">
+
+                                <i class="fas fa-eye"
+                                   id="passwordIcon">
+                                </i>
+
+                            </button>
+
+                        </div>
+
+                        <span asp-validation-for="Password"
+                              class="text-danger lms-error">
+                        </span>
+
+                    </div>
+
+
+                    <!-- GHI NHỚ -->
+                    <div class="lms-options">
+
+                        <label class="lms-checkbox">
+
+                            <input type="checkbox" />
+
+                            <span></span>
+
+                            Ghi nhớ đăng nhập
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- NÚT ĐĂNG NHẬP -->
+                    <button type="submit"
+                            class="lms-login-button">
+
+                        <span>Đăng nhập</span>
+
+                        <i class="fas fa-arrow-right"></i>
+
+                    </button>
+
+
+                </form>
+
+
+                <!-- ĐĂNG KÝ -->
+                <div class="lms-register">
+
+                    <span>
+                        Chưa có tài khoản?
+                    </span>
+
+                    <a asp-action="Register"
+                       asp-controller="Account">
+
+                        Đăng ký ngay
+
+                        <i class="fas fa-arrow-right ms-1"></i>
+
+                    </a>
+
+                </div>
+
+
+                <div class="lms-security">
+
+                    <i class="fas fa-shield-alt"></i>
+
+                    <span>
+                        Thông tin của bạn được bảo mật
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Css {
+
+    <style>
+
+        /* ================================
+               NỀN TRANG
+               ================================ */
+
+        .lms-login-page {
+            min-height: calc(100vh - 90px);
+            background: #f3f6fa;
+            padding: 55px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* ================================
+               KHUNG CHÍNH
+               ================================ */
+
+        .lms-login-container {
+            width: 100%;
+            max-width: 1050px;
+            min-height: 650px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* ================================
+               BÊN TRÁI
+               ================================ */
+
+        .lms-login-left {
+            width: 46%;
+            position: relative;
+            overflow: hidden;
+            padding: 45px;
+            color: white;
+            background: linear-gradient( 145deg, #1f2937 0%, #27384d 55%, #1e3a5f 100% );
+            display: flex;
+            flex-direction: column;
+        }
+
+
+            .lms-login-left::before {
+                content: "";
+                position: absolute;
+                width: 300px;
+                height: 300px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.04);
+                top: -100px;
+                right: -100px;
+            }
+
+
+            .lms-login-left::after {
+                content: "";
+                position: absolute;
+                width: 250px;
+                height: 250px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.03);
+                bottom: -100px;
+                left: -100px;
+            }
+
+
+        /* ================================
+               LOGO
+               ================================ */
+
+        .lms-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 2;
+        }
+
+
+        .lms-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+
+        .lms-brand-name {
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+
+        .lms-brand-sub {
+            font-size: 10px;
+            opacity: .65;
+            letter-spacing: .5px;
+        }
+
+
+        /* ================================
+               NỘI DUNG TRÁI
+               ================================ */
+
+        .lms-left-content {
+            margin-top: 95px;
+            position: relative;
+            z-index: 2;
+        }
+
+
+        .lms-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.15);
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .5px;
+        }
+
+
+        .lms-left-content h1 {
+            font-family: Arial, sans-serif !important;
+            font-size: 38px;
+            line-height: 1.25;
+            font-weight: 700;
+            margin-top: 22px;
+            margin-bottom: 18px;
+            color: white;
+        }
+
+
+            .lms-left-content h1 span {
+                color: #8ec5ff;
+            }
+
+
+        .lms-left-content p {
+            color: rgba(255,255,255,.72);
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 390px;
+            margin-bottom: 30px;
+        }
+
+
+        /* ================================
+               FEATURES
+               ================================ */
+
+        .lms-features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+
+        .lms-feature {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+
+        .feature-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+
+        .lms-feature strong {
+            display: block;
+            font-size: 13px;
+            color: white;
+        }
+
+
+        .lms-feature small {
+            display: block;
+            color: rgba(255,255,255,.55);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+
+        .lms-left-footer {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+            color: rgba(255,255,255,.45);
+            font-size: 11px;
+        }
+
+
+        /* ================================
+               BÊN PHẢI
+               ================================ */
+
+        .lms-login-right {
+            width: 54%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+        }
+
+
+        .lms-form-wrapper {
+            width: 100%;
+            max-width: 410px;
+        }
+
+
+        /* ================================
+               HEADER FORM
+               ================================ */
+
+        .lms-form-header {
+            margin-bottom: 30px;
+        }
+
+
+            .lms-form-header h2 {
+                font-family: Arial, sans-serif !important;
+                font-size: 30px;
+                font-weight: 700;
+                color: #1f2937;
+                margin-bottom: 8px;
+            }
+
+
+            .lms-form-header p {
+                color: #8a94a6;
+                font-size: 14px;
+                margin: 0;
+            }
+
+
+        /* ================================
+               FORM
+               ================================ */
+
+        .lms-form-group {
+            margin-bottom: 22px;
+        }
+
+
+            .lms-form-group label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 8px;
+            }
+
+
+        .lms-input {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+
+            .lms-input > i {
+                position: absolute;
+                left: 16px;
+                color: #9aa5b5;
+                font-size: 14px;
+                z-index: 2;
+            }
+
+
+            .lms-input input {
+                width: 100%;
+                height: 50px;
+                border: 1px solid #dce2e9;
+                border-radius: 10px;
+                outline: none;
+                padding: 0 45px;
+                font-size: 14px;
+                color: #333;
+                background: #fafbfc;
+                transition: .2s;
+            }
+
+
+                .lms-input input::placeholder {
+                    color: #aab2bd;
+                }
+
+
+                .lms-input input:focus {
+                    background: white;
+                    border-color: #527da8;
+                    box-shadow: 0 0 0 3px rgba(82,125,168,.1);
+                }
+
+
+            .lms-input:focus-within > i {
+                color: #527da8;
+            }
+
+
+        /* ================================
+               HIỆN MẬT KHẨU
+               ================================ */
+
+        .lms-show-password {
+            position: absolute;
+            right: 13px;
+            border: 0;
+            background: transparent;
+            color: #9aa5b5;
+            cursor: pointer;
+            padding: 7px;
+        }
+
+
+            .lms-show-password:hover {
+                color: #527da8;
+            }
+
+
+        .lms-password-label {
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+        /* ================================
+               CHECKBOX
+               ================================ */
+
+        .lms-options {
+            margin-top: -3px;
+            margin-bottom: 24px;
+        }
+
+
+        .lms-checkbox {
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+            color: #7b8492 !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            cursor: pointer;
+        }
+
+
+            .lms-checkbox input {
+                display: none;
+            }
+
+
+            .lms-checkbox span {
+                width: 17px;
+                height: 17px;
+                border: 1px solid #d5dbe2;
+                border-radius: 4px;
+                background: white;
+                display: inline-block;
+                position: relative;
+            }
+
+
+            .lms-checkbox input:checked + span {
+                background: #343a40;
+                border-color: #343a40;
+            }
+
+
+                .lms-checkbox input:checked + span::after {
+                    content: "✓";
+                    position: absolute;
+                    color: white;
+                    font-size: 11px;
+                    left: 3px;
+                    top: -1px;
+                }
+
+
+        /* ================================
+               NÚT LOGIN
+               ================================ */
+
+        .lms-login-button {
+            width: 100%;
+            height: 52px;
+            border: none;
+            border-radius: 10px;
+            background: #343a40;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: .25s;
+        }
+
+
+            .lms-login-button:hover {
+                background: #212529;
+                transform: translateY(-1px);
+                box-shadow: 0 7px 20px rgba(33,37,41,.2);
+            }
+
+
+            .lms-login-button i {
+                transition: .25s;
+            }
+
+
+            .lms-login-button:hover i {
+                transform: translateX(4px);
+            }
+
+
+        /* ================================
+               ĐĂNG KÝ
+               ================================ */
+
+        .lms-register {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #8a94a6;
+        }
+
+
+            .lms-register a {
+                color: #527da8;
+                font-weight: 600;
+                text-decoration: none;
+                margin-left: 4px;
+            }
+
+
+                .lms-register a:hover {
+                    color: #2f5f8d;
+                }
+
+
+        /* ================================
+               BẢO MẬT
+               ================================ */
+
+        .lms-security {
+            margin-top: 30px;
+            padding-top: 18px;
+            border-top: 1px solid #edf0f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            color: #a1a9b4;
+            font-size: 11px;
+        }
+
+
+            .lms-security i {
+                color: #7caa8a;
+            }
+
+
+        .lms-alert {
+            font-size: 13px;
+            padding: 10px 12px;
+        }
+
+
+            .lms-alert:empty {
+                display: none;
+            }
+
+
+        .lms-error {
+            font-size: 11px;
+        }
+
+
+        .lms-mobile-logo {
+            display: none;
+        }
+
+
+        /* ================================
+               RESPONSIVE
+               ================================ */
+
+        @@media (max-width: 991px) {
+
+            .lms-login-container {
+                max-width: 520px;
+            }
+
+            .lms-login-left {
+                display: none;
+            }
+
+            .lms-login-right {
+                width: 100%;
+                padding: 45px 40px;
+            }
+
+            .lms-mobile-logo {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .lms-mobile-icon {
+                width: 55px;
+                height: 55px;
+                border-radius: 14px;
+                background: #343a40;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 25px;
+            }
+        }
+
+
+        @@media (max-width: 575px) {
+
+            .lms-login-page {
+                padding: 25px 12px;
+            }
+
+            .lms-login-container {
+                border-radius: 14px;
+            }
+
+            .lms-login-right {
+                padding: 35px 22px;
+            }
+
+            .lms-form-header h2 {
+                font-size: 26px;
+            }
+        }
+
+    </style>
+
+}
+
+
+@section Scripts {
+
+    <script>
+
+        function togglePassword() {
+
+            const password = document.getElementById("Password");
+            const icon = document.getElementById("passwordIcon");
+
+            if (!password) return;
+
+            if (password.type === "password") {
+
+                password.type = "text";
+
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+
+            } else {
+
+                password.type = "password";
+
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+
+            }
+        }
+
+    </script>
+
+}

@@ -1,0 +1,478 @@
+﻿@model IEnumerable<Web.Models.EF.Course>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Khóa học";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>E-Learning - Khóa học</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+
+        .navbar {
+            height: 58px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 25px;
+            white-space: nowrap;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #334155;
+            padding: 20px 16px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+            .nav-item:hover {
+                color: #2563eb;
+                background: #f8fafc;
+            }
+
+            .nav-item.active {
+                color: #2563eb;
+                font-weight: 600;
+            }
+
+        .user-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recent {
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .login-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 22px;
+            text-decoration: none;
+        }
+
+            .login-icon:hover {
+                background: #f1f5f9;
+                color: #2563eb;
+            }
+
+            .nav-item:hover {
+                color: #2563eb;
+            }
+
+        .main {
+            padding: 35px 8%;
+        }
+
+        .top-menu {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            background: white;
+            border: 2px solid #b8cdfc;
+            border-radius: 8px;
+            padding: 15px 25px;
+            font-size: 16px;
+        }
+
+        .course-count {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            height: 100%;
+            transition: 0.2s;
+        }
+
+            .course-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            }
+
+        .course-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #ddd;
+        }
+
+        .course-body {
+            padding: 20px;
+        }
+
+        .badge-course {
+            display: inline-block;
+            background: #eef2f7;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .course-title {
+            font-size: 19px;
+            font-weight: bold;
+            min-height: 55px;
+        }
+
+        .teacher {
+            color: #64748b;
+            margin-top: 15px;
+        }
+
+        .btn-course {
+            margin-top: 15px;
+            width: 100%;
+            border-radius: 6px;
+        }
+        /* ================= CATEGORY HEADER ================= */
+
+        .course-category-header {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: #111827;
+        }
+
+        .category-tabs {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            height: 45px;
+            border-bottom: 1px solid #d1d5db;
+        }
+
+        .category-tab {
+            height: 45px;
+            display: flex;
+            align-items: center;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 15px;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .category-more {
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .course-search-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 22px 0 15px 0;
+            border-bottom: 1px solid #d1d5db;
+        }
+
+        .search-box {
+            width: 235px;
+            height: 44px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+        }
+
+            .search-box i {
+                font-size: 19px;
+                color: #475569;
+                margin-right: 9px;
+            }
+
+            .search-box input {
+                width: 100%;
+                height: 100%;
+                border: none;
+                outline: none;
+                font-size: 14px;
+            }
+
+        .category-filter {
+            height: 44px;
+            min-width: 130px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 0 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- MENU -->
+
+    <div class="navbar">
+
+        <a href="/" class="logo">
+            E-Learning
+        </a>
+
+        <a href="/" class="nav-item">
+            Trang chủ
+        </a>
+
+        <a href="/Course" class="nav-item active">
+            Chuyên mục
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="MyCourses"
+           class="nav-item">
+            Khóa học của tôi
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="Results"
+           class="nav-item">
+            Kết quả học tập
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="LookupScore"
+           class="nav-item">
+            Tra cứu điểm
+        </a>
+
+        <div class="user-area">
+
+            <span class="recent">
+                Tin gần đây
+            </span>
+
+            <a href="/Account/Login"
+               class="login-icon"
+               title="Đăng nhập">
+                <i class="bi bi-person-circle"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- NỘI DUNG -->
+    <div class="main">
+
+        <!-- ================= CATEGORY HEADER ================= -->
+
+        <div class="course-category-header">
+
+            <h1 class="category-title">
+                Khảo thí
+            </h1>
+
+            <div class="category-tabs">
+
+                <a href="/Course"
+                   class="category-tab">
+                    Danh mục
+                </a>
+
+                <button type="button"
+                        class="category-more">
+                    
+                </button>
+
+            </div>
+
+            <div class="course-search-area">
+
+                <div class="search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           id="courseSearch"
+                           placeholder="Tìm kiếm khóa học"  />
+
+                </div>
+
+                
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SỐ LƯỢNG KHÓA HỌC ================= -->
+
+        <div class="course-count">
+            @Model.Count() Khóa học
+        </div>
+
+
+        <div class="row g-4">
+
+            @foreach (var course in Model)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6">
+
+                    <div class="course-card"
+                         data-course-name="@course.Title.ToLower()">
+
+                        @if (!string.IsNullOrEmpty(course.Image))
+                        {
+                            <img src="@course.Image"
+                                 class="course-image"
+                                 alt="@course.Title" />
+                        }
+                        else
+                        {
+                            <div class="course-image"></div>
+                        }
+
+                        <div class="course-body">
+
+                            <span class="badge-course">
+                                Khóa học
+                            </span>
+
+                            <div class="course-title">
+                                @course.Title
+                            </div>
+
+                            <div class="teacher">
+                                👤
+                                @(course.Teacher?.Username ?? "Giáo viên")
+                            </div>
+
+                            <a asp-controller="Course"
+                               asp-action="Details"
+                               asp-route-id="@course.Id"
+                               class="btn btn-primary btn-course">
+                                Xem khóa học
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+    <script>
+
+        const courseSearch = document.getElementById("courseSearch");
+
+        if (courseSearch) {
+
+            courseSearch.addEventListener("input", function () {
+
+                const keyword = this.value
+                    .trim()
+                    .toLowerCase();
+
+                document.querySelectorAll(".course-card").forEach(card => {
+
+                    const courseName =
+                        card.dataset.courseName || "";
+
+                    const column =
+                        card.closest(".col-xl-3");
+
+                    if (courseName.includes(keyword)) {
+
+                        column.style.display = "";
+
+                    } else {
+
+                        column.style.display = "none";
+
+                    }
+
+                });
+
+            });
+
+            courseSearch.addEventListener("keydown", function (e) {
+
+                if (e.key === "Enter") {
+
+                    e.preventDefault();
+
+                    this.dispatchEvent(
+                        new Event("input")
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+
+    <!-- ============ AI TUTOR CHATBOT WIDGET ============ -->
+    @{
+        var tutorCtx = new ChatWidgetModel { ContextLabel = "Hỏi về nội dung các khóa học" };
+    }
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+</body>
+</html>

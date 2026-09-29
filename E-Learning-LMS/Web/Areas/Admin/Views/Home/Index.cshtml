@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark" style="font-weight: 600;">Trang Quản Trị</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nội dung hiển thị các ô thống kê -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Hộp 1: Khóa học (Màu Xanh Dương) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@ViewBag.CourseCount</h3>
+                        <p>Khóa Học</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Lesson", new { area = "Admin" })" class="small-box-footer">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hộp 2: Sinh viên (Màu Xanh Lá) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@ViewBag.StudentCount</h3>
+                        <p>Sinh Viên</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Student", new { area = "Admin" })" class="small-box-footer">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hộp 3: Giảng viên (Màu Vàng) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner" style="color: #fff !important;">
+                        <h3 style="color: #fff !important;">@ViewBag.TeacherCount</h3>
+                        <p style="color: #fff !important;">Giảng Viên</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <a href="@Url.Action("Index", "Course", new { area = "Admin" })" class="small-box-footer" style="color: #fff !important;">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right" style="color: #fff !important;"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hộp 4: Hội thoại với Trợ giảng AI (Màu Đỏ) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.ChatConversationCount</h3>
+                        <p>Hội Thoại AI</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <span class="small-box-footer" style="cursor: default;">
+                        Tổng số cuộc trò chuyện với Trợ giảng AI
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

@@ -1,0 +1,586 @@
+﻿@{
+    ViewBag.Title = "Quản lý sinh viên";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-user-graduate mr-2"></i>
+            Quản lý sinh viên
+        </h3>
+    </div>
+
+    <div class="card-body table-responsive">
+        <table id="items" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th style="width: 50px">#</th>
+                    <th>MSSV</th>
+                    <th>Họ và tên</th>
+                    <th>Email</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Lớp</th>
+                    <th>Tài khoản</th>
+                    <th>Trực tuyến</th>
+                    <th style="width: 80px"></th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Modal thêm / sửa sinh viên -->
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Thông tin sinh viên</h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="Item">
+
+                    <input type="hidden" id="Id" name="Id" />
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>MSSV</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="MSSV"
+                                       name="MSSV"
+                                       placeholder="Nhập mã số sinh viên" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Họ và tên</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="FullName"
+                                       name="FullName"
+                                       placeholder="Nhập họ và tên" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email"
+                                       class="form-control"
+                                       id="Email"
+                                       name="Email"
+                                       placeholder="Nhập email" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Lớp</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="ClassName"
+                                       name="ClassName"
+                                       placeholder="Nhập tên lớp" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tên đăng nhập</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="Username"
+                                       name="Username"
+                                       placeholder="Nhập tên đăng nhập" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Mật khẩu</label>
+                                <input type="password"
+                                       class="form-control"
+                                       id="Password"
+                                       name="Password"
+                                       placeholder="Nhập mật khẩu" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Trạng thái</label>
+
+                                <select class="form-control"
+                                        id="IsActive"
+                                        name="IsActive">
+
+                                    <option value="true">Đang hoạt động</option>
+                                    <option value="false">Đã khóa</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer justify-content-between">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+                    Đóng
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary btnSave">
+                    <i class="fas fa-save mr-1"></i>
+                    Lưu
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Css {
+
+    <link href="/plugins/datatables-bs4/css/datatables.bootstrap4.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/toastr/toastr.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/sweetalert2/sweetalert2.min.css"
+          rel="stylesheet" />
+}
+
+
+@section Js {
+
+    <script src="/plugins/datatables/jquery.datatables.min.js"></script>
+
+    <script src="/plugins/datatables-bs4/js/datatables.bootstrap4.min.js"></script>
+
+    <script src="/plugins/datatables-buttons/js/datatables.buttons.min.js"></script>
+
+    <script src="/plugins/toastr/toastr.min.js"></script>
+
+    <script src="/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+
+
+    <script>
+
+        $(function () {
+
+            // ==========================
+            // DANH SÁCH SINH VIÊN
+            // ==========================
+
+            var items = $("#items").DataTable({
+
+                "dom": 'Blfrtip',
+
+                "processing": true,
+
+                "serverSide": true,
+
+                "ajax": {
+
+                    "url": "/Admin/Student/getList",
+
+                    "type": "POST",
+
+                    "dataType": "json",
+
+                    "error": function () {
+
+                        toastr.error(
+                            "Không thể tải danh sách sinh viên."
+                        );
+
+                    }
+
+                },
+
+                "columns": [
+
+                    {
+                        "data": null,
+
+                        "render": function (
+                            data,
+                            type,
+                            row,
+                            meta
+                        ) {
+
+                            return meta.row + 1;
+
+                        }
+
+                    },
+
+                    {
+                        "data": "mssv"
+                    },
+
+                    {
+                        "data": "fullName"
+                    },
+
+                    {
+                        "data": "email"
+                    },
+
+                    {
+                        "data": "username"
+                    },
+
+                    {
+                        "data": "className"
+                    },
+
+                         {
+            "data": "isActive",
+
+            "render": function (data) {
+
+                if (data) {
+                    return '<span class="badge badge-success">' +
+                        '<i class="fas fa-check-circle mr-1"></i>' +
+                        'Đang hoạt động' +
+                        '</span>';
+                }
+
+                return '<span class="badge badge-danger">' +
+                    '<i class="fas fa-lock mr-1"></i>' +
+                    'Đã khóa' +
+                    '</span>';
+            }
+
+        },
+
+        {
+            "data": "isOnline",
+
+            "render": function (data) {
+
+                if (data) {
+                    return '<span class="badge badge-success">' +
+                        '<i class="fas fa-circle mr-1"></i>' +
+                        'Online' +
+                        '</span>';
+                }
+
+                return '<span class="badge badge-secondary">' +
+                    '<i class="fas fa-circle mr-1"></i>' +
+                    'Offline' +
+                    '</span>';
+            }
+
+        },
+
+                    {
+
+                        "data": null,
+
+                        "render": function (
+                            data,
+                            type,
+                            row
+                        ) {
+
+                            return (
+
+                                '<div class="btn-group">' +
+
+                                '<a href="#" ' +
+                                'data-toggle="dropdown" ' +
+                                'class="list-icons-item text-dark">' +
+
+                                '<i class="fas fa-ellipsis-v"></i>' +
+
+                                '</a>' +
+
+                                '<div class="dropdown-menu">' +
+
+                                '<a class="dropdown-item text-primary btnEdit" ' +
+                                'href="#" ' +
+                                'data-id="' + row.id + '">' +
+
+                                '<i class="fas fa-pencil-alt mr-2"></i>' +
+                                'Cập nhật' +
+
+                                '</a>' +
+
+                                '<a class="dropdown-item text-danger btnDelete" ' +
+                                'href="#" ' +
+                                'data-id="' + row.id + '">' +
+
+                                '<i class="fas fa-trash mr-2"></i>' +
+                                'Xóa' +
+
+                                '</a>' +
+
+                                '</div>' +
+
+                                '</div>'
+
+                            );
+
+                        }
+
+                    }
+
+                ],
+
+
+                // ==========================
+                // NÚT THÊM SINH VIÊN
+                // ==========================
+
+                "buttons": [
+
+                    {
+
+                        text:
+                            '<i class="fa fa-plus mr-2"></i>' +
+                            'Thêm sinh viên',
+
+                        className:
+                            'btn btn-info pb-1',
+
+                        action: function () {
+
+                            $("#Item")[0].reset();
+
+                            $("#Id").val("");
+
+                            $("#IsActive").val("true");
+
+                            $("#modal-default").modal("show");
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
+
+            // ==========================
+            // SỬA SINH VIÊN
+            // ==========================
+
+            $(document).on(
+                "click",
+                "a.btnEdit",
+                function () {
+
+                    let id = $(this).data("id");
+
+                    $.getJSON(
+                        "/Admin/Student/GetItem",
+                        {
+                            id: id
+                        },
+
+                        function (item) {
+
+                            $("#Id").val(item.id);
+
+                            $("#MSSV").val(item.mssv);
+
+                            $("#FullName").val(item.fullName);
+
+                            $("#Email").val(item.email);
+
+                            $("#Username").val(item.username);
+
+                            $("#ClassName").val(item.className);
+
+                            $("#IsActive").val(
+                                item.isActive ? "true" : "false"
+                            );
+
+                            // Không hiển thị mật khẩu cũ
+                            $("#Password").val("");
+
+                            $("#modal-default").modal("show");
+
+                        }
+
+                    ).fail(function () {
+
+                        toastr.error(
+                            "Không thể lấy thông tin sinh viên."
+                        );
+
+                    });
+
+                }
+            );
+
+
+            // ==========================
+            // LƯU SINH VIÊN
+            // ==========================
+
+            $(".btnSave").on(
+                "click",
+                function () {
+
+                    var form = $("#Item")[0];
+
+                    var formData = new FormData(form);
+
+                    $.ajax({
+
+                        data: formData,
+
+                        url:
+                            "/Admin/Student/Save",
+
+                        type: "POST",
+
+                        processData: false,
+
+                        contentType: false,
+
+                        success: function () {
+
+                            $("#modal-default")
+                                .modal("hide");
+
+                            toastr.success(
+                                "Lưu sinh viên thành công!"
+                            );
+
+                            items.ajax.reload();
+
+                        },
+
+                        error: function () {
+
+                            toastr.error(
+                                "Không thể lưu sinh viên."
+                            );
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            // ==========================
+            // XÓA SINH VIÊN
+            // ==========================
+
+            $(document).on(
+                "click",
+                "a.btnDelete",
+                function () {
+
+                    let id =
+                        $(this).data("id");
+
+                    Swal.fire({
+
+                        title:
+                            "Bạn chắc không?",
+
+                        text:
+                            "Xóa sinh viên sẽ không thể phục hồi!",
+
+                        showCancelButton:
+                            true,
+
+                        confirmButtonColor:
+                            "#d33",
+
+                        cancelButtonColor:
+                            "#3085d6",
+
+                        confirmButtonText:
+                            "Xác nhận",
+
+                        cancelButtonText:
+                            "Hủy"
+
+                    }).then(function (result) {
+
+                        if (result.isConfirmed) {
+
+                            $.get(
+                                "/Admin/Student/Delete",
+
+                                {
+                                    id: id
+                                },
+
+                                function (data) {
+
+                                    if (data == true) {
+
+                                        toastr.success(
+                                            "Xóa sinh viên thành công."
+                                        );
+
+                                        items.ajax.reload();
+
+                                    }
+                                    else {
+
+                                        toastr.error(
+                                            "Không thể xóa sinh viên."
+                                        );
+
+                                    }
+
+                                }
+
+                            ).fail(function () {
+
+                                toastr.error(
+                                    "Không có quyền thực hiện."
+                                );
+
+                            });
+
+                        }
+
+                    });
+
+                }
+
+            );
+
+        });
+
+    </script>
+}

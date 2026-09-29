@@ -1,0 +1,954 @@
+@model List<Web.Models.EF.Course>
+
+@{
+    ViewBag.Title = "Quản lý khóa học";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+
+<div class="card">
+
+    <!-- ============================= -->
+    <!-- HEADER -->
+    <!-- ============================= -->
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+
+            <h1 class="card-title mb-0">
+                Quản lý khóa học
+            </h1>
+
+            <button type="button"
+                    class="btn btn-primary"
+                    id="btnAddCourse">
+                <i class="fas fa-plus"></i>
+                Thêm khóa học
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- TABLE -->
+    <!-- ============================= -->
+    <div class="card-body table-responsive">
+
+        <table id="courseTable"
+               class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+
+                    <th style="width:60px">
+                        STT
+                    </th>
+
+                    <th style="width:120px">
+                        Ảnh
+                    </th>
+
+                    <th>
+                        Tên khóa học
+                    </th>
+
+                    <th>
+                        Giảng viên
+                    </th>
+
+                    <th>
+                        Mô tả
+                    </th>
+
+                    <th style="width:120px">
+                        Ngày tạo
+                    </th>
+
+                    <th style="width:220px">
+                        Hành động
+                    </th>
+
+                </tr>
+            </thead>
+
+
+            <tbody>
+
+                @{
+                    int stt = 1;
+                }
+
+                @foreach (var course in Model)
+                {
+                    <tr>
+
+                        <!-- STT -->
+                        <td>
+                            @stt
+                        </td>
+
+
+                        <!-- ẢNH -->
+                        <td class="text-center">
+
+                            @if (!string.IsNullOrWhiteSpace(course.Image))
+                            {
+                                <img src="@course.Image"
+                                     alt="@course.Title"
+                                     style="
+                                        width: 90px;
+                                        height: 60px;
+                                        object-fit: cover;
+                                        border-radius: 6px;
+                                        border: 1px solid #ddd;
+                                             " />
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    Chưa có ảnh
+                                </span>
+                            }
+
+                        </td>
+
+
+                        <!-- TÊN KHÓA HỌC -->
+                        <td>
+                            <strong>
+                                @course.Title
+                            </strong>
+                        </td>
+
+
+                        <!-- GIẢNG VIÊN -->
+                        <td>
+                            @(course.Teacher?.FullName ?? "Chưa có")
+                        </td>
+
+
+                        <!-- MÔ TẢ -->
+                        <td>
+                            @course.Description
+                        </td>
+
+
+                        <!-- NGÀY TẠO -->
+                        <td>
+                            @course.CreatedAt.ToString("dd/MM/yyyy")
+                        </td>
+
+
+                        <!-- HÀNH ĐỘNG -->
+                        <td>
+
+                            <!-- BÀI HỌC -->
+                            <a href="@Url.Action(
+                                "Lessons",
+                                "Lesson",
+                                new
+                                {
+                                    area = "Admin",
+                                    courseId = course.Id
+                                })"
+                               class="btn btn-info btn-sm"
+                               title="Quản lý bài học">
+
+                                <i class="fas fa-book"></i>
+                                Bài học
+
+                            </a>
+
+
+                            <!-- CẬP NHẬT -->
+                            <button type="button"
+                                    class="btn btn-warning btn-sm btnEditCourse"
+                                    data-id="@course.Id"
+                                    title="Cập nhật">
+
+                                <i class="fas fa-edit"></i>
+
+                            </button>
+
+
+                            <!-- XÓA -->
+                            <button type="button"
+                                    class="btn btn-danger btn-sm btnDeleteCourse"
+                                    data-id="@course.Id"
+                                    title="Xóa">
+
+                                <i class="fas fa-trash"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    stt++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODAL THÊM / CẬP NHẬT KHÓA HỌC -->
+<!-- ===================================================== -->
+
+<div class="modal fade"
+     id="modal-course"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg"
+         role="document">
+
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header">
+
+                <h4 class="modal-title"
+                    id="course-modal-title">
+
+                    Thêm khóa học
+
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="course-id" />
+
+
+                <!-- TÊN KHÓA HỌC -->
+                <div class="form-group">
+
+                    <label>
+                        Tên khóa học
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <input type="text"
+                           id="course-title"
+                           class="form-control"
+                           placeholder="Nhập tên khóa học" />
+
+                </div>
+
+
+                <!-- GIẢNG VIÊN -->
+                <div class="form-group">
+
+                    <label>
+                        Giảng viên
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select id="course-teacher"
+                            class="form-control">
+
+                        <option value="">
+                            -- Chọn giảng viên --
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- MÔ TẢ -->
+                <div class="form-group">
+
+                    <label>
+                        Mô tả
+                    </label>
+
+                    <textarea id="course-description"
+                              class="form-control"
+                              rows="5"
+                              placeholder="Nhập mô tả khóa học"></textarea>
+
+                </div>
+
+
+                <!-- LỊCH HỌC -->
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Thứ trong tuần</label>
+                            <select id="course-day" class="form-control">
+                                <option value="">-- Không cố định --</option>
+                                <option value="1">Thứ hai</option>
+                                <option value="2">Thứ ba</option>
+                                <option value="3">Thứ tư</option>
+                                <option value="4">Thứ năm</option>
+                                <option value="5">Thứ sáu</option>
+                                <option value="6">Thứ bảy</option>
+                                <option value="0">Chủ nhật</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Giờ bắt đầu</label>
+                            <input type="time" id="course-start-time" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Giờ kết thúc</label>
+                            <input type="time" id="course-end-time" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Phòng học</label>
+                            <input type="text" id="course-room" class="form-control" placeholder="VD: A101" />
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- HÌNH ẢNH -->
+                <div class="form-group">
+
+                    <label>
+                        Hình ảnh khóa học
+                    </label>
+
+                    <input type="file"
+                           id="course-image"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.gif,.webp" />
+
+                    <small class="form-text text-muted">
+                        Chọn ảnh từ máy tính: JPG, JPEG, PNG, GIF hoặc WEBP.
+                    </small>
+
+                </div>
+
+
+                <!-- XEM ẢNH -->
+                <div class="form-group">
+
+                    <label>
+                        Ảnh hiện tại
+                    </label>
+
+                    <div id="course-image-preview">
+                        <span class="text-muted">
+                            Chưa có ảnh
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal">
+
+                    Đóng
+
+                </button>
+
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="btnSaveCourse">
+
+                    <i class="fas fa-save"></i>
+                    Lưu khóa học
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Css {
+
+    <link href="/plugins/toastr/toastr.min.css"
+          rel="stylesheet" />
+
+    <style>
+
+        #course-image-preview img {
+            width: 160px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+    </style>
+
+}
+
+
+@section Js {
+
+    <script src="/plugins/toastr/toastr.min.js"></script>
+
+
+    <script>
+
+        // =====================================================
+        // LOAD DANH SÁCH GIẢNG VIÊN
+        // =====================================================
+
+        function loadTeachers(selectedId = null) {
+
+            $.ajax({
+
+                url: '/Admin/Lesson/GetTeachers',
+
+                type: 'GET',
+
+                success: function (result) {
+
+                    var select = $('#course-teacher');
+
+                    select.empty();
+
+                    select.append(`
+                        <option value="">
+                            -- Chọn giảng viên --
+                        </option>
+                    `);
+
+
+                    if (result && result.length > 0) {
+
+                        result.forEach(function (teacher) {
+
+                            var selected = '';
+
+                            if (selectedId &&
+                                selectedId.toString().toLowerCase()
+                                === teacher.id.toString().toLowerCase()) {
+
+                                selected = 'selected';
+                            }
+
+
+                            select.append(`
+                                <option value="${teacher.id}" ${selected}>
+                                    ${teacher.fullName}
+                                    ${teacher.username
+                                        ? ' - ' + teacher.username
+                                        : ''}
+                                </option>
+                            `);
+
+                        });
+
+                    }
+
+                },
+
+                error: function () {
+
+                    toastr.error(
+                        'Không thể tải danh sách giảng viên.'
+                    );
+
+                }
+
+            });
+
+        }
+
+
+
+        // =====================================================
+        // HIỂN THỊ ẢNH
+        // =====================================================
+
+        function showImagePreview(imageUrl) {
+
+            if (imageUrl) {
+
+                $('#course-image-preview').html(`
+                    <img src="${imageUrl}"
+                         alt="Ảnh khóa học" />
+                `);
+
+            }
+            else {
+
+                $('#course-image-preview').html(`
+                    <span class="text-muted">
+                        Chưa có ảnh
+                    </span>
+                `);
+
+            }
+
+        }
+
+
+
+        // =====================================================
+        // XEM ẢNH ĐƯỢC CHỌN TỪ MÁY
+        // =====================================================
+
+        $('#course-image').on('change', function () {
+
+            var file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+
+                showImagePreview(e.target.result);
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+
+
+        // =====================================================
+        // THÊM KHÓA HỌC
+        // =====================================================
+
+        $('#btnAddCourse').on('click', function () {
+
+            // Xóa dữ liệu cũ
+            $('#course-id').val('');
+
+            $('#course-title').val('');
+
+            $('#course-description').val('');
+
+            $('#course-day').val('');
+            $('#course-start-time').val('');
+            $('#course-end-time').val('');
+            $('#course-room').val('');
+
+            // Quan trọng:
+            // reset input file
+            $('#course-image').val('');
+
+            // Xóa ảnh preview
+            showImagePreview(null);
+
+            // Tiêu đề modal
+            $('#course-modal-title')
+                .text('Thêm khóa học');
+
+            // Load giảng viên
+            loadTeachers();
+
+            // Mở modal
+            $('#modal-course').modal('show');
+
+        });
+
+
+
+        // =====================================================
+        // CẬP NHẬT KHÓA HỌC
+        // =====================================================
+
+        $(document).on(
+            'click',
+            '.btnEditCourse',
+            function () {
+
+                var id = $(this).data('id');
+
+
+                $.ajax({
+
+                    url: '/Admin/Lesson/GetCourse',
+
+                    type: 'GET',
+
+                    data: {
+                        id: id
+                    },
+
+
+                    success: function (result) {
+
+                        $('#course-id')
+                            .val(result.id);
+
+
+                        $('#course-title')
+                            .val(result.title);
+
+
+                        $('#course-description')
+                            .val(result.description || '');
+
+
+                        $('#course-day')
+                            .val(result.scheduleDayOfWeek !== null && result.scheduleDayOfWeek !== undefined ? result.scheduleDayOfWeek : '');
+
+                        $('#course-start-time')
+                            .val(result.scheduleStartTime || '');
+
+                        $('#course-end-time')
+                            .val(result.scheduleEndTime || '');
+
+                        $('#course-room')
+                            .val(result.room || '');
+
+
+                        // KHÔNG dùng:
+                        // $('#course-image').val(result.image);
+
+                        // Vì input type="file" không được
+                        // gán giá trị bằng JavaScript.
+
+
+                        // Reset file hiện tại
+                        $('#course-image')
+                            .val('');
+
+
+                        // Hiển thị ảnh cũ
+                        showImagePreview(result.image);
+
+
+                        $('#course-modal-title')
+                            .text('Cập nhật khóa học');
+
+
+                        // Load giảng viên
+                        // + chọn giảng viên hiện tại
+                        loadTeachers(result.teacherId);
+
+
+                        $('#modal-course')
+                            .modal('show');
+
+                    },
+
+
+                    error: function () {
+
+                        toastr.error(
+                            'Không thể tải thông tin khóa học.'
+                        );
+
+                    }
+
+                });
+
+            }
+        );
+
+
+
+        // =====================================================
+        // LƯU KHÓA HỌC
+        // =====================================================
+
+        $('#btnSaveCourse').on(
+            'click',
+            function () {
+
+                var id =
+                    $('#course-id').val();
+
+                var title =
+                    $('#course-title').val();
+
+                var description =
+                    $('#course-description').val();
+
+                var teacherId =
+                    $('#course-teacher').val();
+
+
+                // =============================================
+                // VALIDATE
+                // =============================================
+
+                if (!title || !title.trim()) {
+
+                    toastr.error(
+                        'Tên khóa học không được để trống.'
+                    );
+
+                    return;
+
+                }
+
+
+                if (!teacherId) {
+
+                    toastr.error(
+                        'Vui lòng chọn giảng viên.'
+                    );
+
+                    return;
+
+                }
+
+
+                // =============================================
+                // TẠO FORMDATA
+                // =============================================
+
+                var formData = new FormData();
+
+                formData.append(
+                    'Id',
+                    id
+                );
+
+                formData.append(
+                    'Title',
+                    title
+                );
+
+                formData.append(
+                    'Description',
+                    description || ''
+                );
+
+                formData.append(
+                    'TeacherId',
+                    teacherId
+                );
+
+                formData.append(
+                    'ScheduleDayOfWeek',
+                    $('#course-day').val() || ''
+                );
+
+                formData.append(
+                    'ScheduleStartTime',
+                    $('#course-start-time').val() || ''
+                );
+
+                formData.append(
+                    'ScheduleEndTime',
+                    $('#course-end-time').val() || ''
+                );
+
+                formData.append(
+                    'Room',
+                    $('#course-room').val() || ''
+                );
+
+
+                // =============================================
+                // LẤY FILE ẢNH THẬT
+                // =============================================
+
+                var imageFile =
+                    $('#course-image')[0].files[0];
+
+
+                if (imageFile) {
+
+                    formData.append(
+                        'ImageFile',
+                        imageFile
+                    );
+
+                }
+
+
+                // =============================================
+                // GỬI SERVER
+                // =============================================
+
+                $.ajax({
+
+                    url: '/Admin/Lesson/SaveCourse',
+
+                    type: 'POST',
+
+                    data: formData,
+
+                    // BẮT BUỘC khi gửi file
+                    processData: false,
+
+                    contentType: false,
+
+
+                    success: function (result) {
+
+                        toastr.success(
+                            result.message ||
+                            'Lưu khóa học thành công.'
+                        );
+
+
+                        $('#modal-course')
+                            .modal('hide');
+
+
+                        setTimeout(function () {
+
+                            location.reload();
+
+                        }, 700);
+
+                    },
+
+
+                    error: function (xhr) {
+
+                        var message =
+                            'Không thể lưu khóa học.';
+
+
+                        if (xhr.responseJSON &&
+                            xhr.responseJSON.message) {
+
+                            message =
+                                xhr.responseJSON.message;
+
+                        }
+                        else if (xhr.responseText) {
+
+                            message =
+                                xhr.responseText;
+
+                        }
+
+
+                        toastr.error(message);
+
+                    }
+
+                });
+
+            }
+        );
+
+
+
+        // =====================================================
+        // XÓA KHÓA HỌC
+        // =====================================================
+
+        $(document).on(
+            'click',
+            '.btnDeleteCourse',
+            function () {
+
+                var id =
+                    $(this).data('id');
+
+
+                if (!confirm(
+                    'Bạn có chắc muốn xóa khóa học này?\n\n' +
+                    'Các bài học và đăng ký của sinh viên trong khóa học cũng sẽ bị xóa.'
+                )) {
+
+                    return;
+
+                }
+
+
+                $.ajax({
+
+                    url: '/Admin/Lesson/DeleteCourse',
+
+                    type: 'POST',
+
+                    data: {
+                        id: id
+                    },
+
+
+                    success: function (result) {
+
+                        toastr.success(
+                            result.message ||
+                            'Xóa khóa học thành công.'
+                        );
+
+
+                        setTimeout(function () {
+
+                            location.reload();
+
+                        }, 700);
+
+                    },
+
+
+                    error: function (xhr) {
+
+                        var message =
+                            'Không thể xóa khóa học.';
+
+
+                        if (xhr.responseJSON &&
+                            xhr.responseJSON.message) {
+
+                            message =
+                                xhr.responseJSON.message;
+
+                        }
+                        else if (xhr.responseText) {
+
+                            message =
+                                xhr.responseText;
+
+                        }
+
+
+                        toastr.error(message);
+
+                    }
+
+                });
+
+            }
+        );
+
+    </script>
+
+}

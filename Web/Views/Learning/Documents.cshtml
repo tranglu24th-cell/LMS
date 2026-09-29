@@ -1,0 +1,1292 @@
+﻿@model IEnumerable<Web.Models.EF.PersonalDocument>
+
+@{
+    Layout = null;
+
+    ViewData["Title"] = "Tài liệu cá nhân";
+
+    var student = ViewBag.Student as Web.Models.EF.User;
+
+    var success = TempData["Success"] as string;
+
+    var error = TempData["Error"] as string;
+
+    var isEn = Context.Request.Cookies["lang"] == "en";
+
+    string displayName =
+        student?.FullName
+        ?? User.Identity?.Name
+        ?? "Sinh viên";
+
+    string avatarLetter =
+        string.IsNullOrWhiteSpace(displayName)
+            ? "U"
+            : displayName.Substring(0, 1).ToUpper();
+}
+
+<!DOCTYPE html>
+
+<html lang="@(isEn ? "en" : "vi")">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @(isEn ? "My Documents - E-Learning" : "Tài liệu cá nhân - E-Learning")
+    </title>
+
+
+    <!-- =====================================================
+         BOOTSTRAP
+    ===================================================== -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+
+    <!-- =====================================================
+         BOOTSTRAP ICONS
+    ===================================================== -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet" />
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #1e293b;
+        }
+
+
+        /* =====================================================
+                   NAVBAR
+                ===================================================== */
+
+        .navbar-custom {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 45px;
+            white-space: nowrap;
+        }
+
+
+        .nav-link-custom {
+            text-decoration: none;
+            color: #334155;
+            font-size: 15px;
+            margin-right: 30px;
+            white-space: nowrap;
+        }
+
+
+            .nav-link-custom:hover {
+                color: #2563eb;
+            }
+
+
+            .nav-link-custom.active {
+                color: #2563eb;
+                font-weight: bold;
+            }
+
+
+        /* =====================================================
+                   ACCOUNT
+                ===================================================== */
+
+        .account-area {
+            margin-left: auto;
+            position: relative;
+        }
+
+
+        .account-dropdown {
+            position: relative;
+        }
+
+
+        .account-button {
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px 8px;
+            color: #1e293b;
+            font-size: 15px;
+        }
+
+
+            .account-button:hover {
+                color: #2563eb;
+            }
+
+
+        .account-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #34495e;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+
+        .account-name {
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        .account-arrow {
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+                   ACCOUNT MENU
+                ===================================================== */
+
+        .account-menu {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            width: 295px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            padding: 8px 0;
+            display: none;
+            z-index: 99999;
+        }
+
+
+            .account-menu.show {
+                display: block;
+            }
+
+
+        /* =====================================================
+                   ACCOUNT ITEM
+                ===================================================== */
+
+        .account-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            height: 55px;
+            padding: 0 25px;
+            text-decoration: none;
+            color: #111827;
+            font-size: 16px;
+        }
+
+
+            .account-menu-item:hover {
+                background: #f5f7fb;
+                color: #2563eb;
+            }
+
+
+            .account-menu-item i:first-child {
+                width: 22px;
+                font-size: 20px;
+                text-align: center;
+                color: #111827;
+            }
+
+
+            .account-menu-item:hover i:first-child {
+                color: #2563eb;
+            }
+
+
+        /* =====================================================
+                   DIVIDER
+                ===================================================== */
+
+        .account-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 7px 0;
+        }
+
+
+        /* =====================================================
+                   LANGUAGE
+                ===================================================== */
+
+        .language-item {
+            cursor: default;
+        }
+
+
+            .language-item:hover {
+                background: transparent;
+                color: #111827;
+            }
+
+
+                .language-item:hover i:first-child {
+                    color: #111827;
+                }
+
+
+        .language-title {
+            flex: 1;
+        }
+
+
+        .language-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+
+        .language-btn {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+
+            .language-btn.active {
+                background: #2563eb;
+                color: #ffffff;
+            }
+
+
+            .language-btn.inactive {
+                background: #f1f5f9;
+                color: #334155;
+            }
+
+
+            .language-btn:hover {
+                text-decoration: none;
+            }
+
+
+        /* =====================================================
+                   LOGOUT
+                ===================================================== */
+
+        .logout-item:hover {
+            background: #fff1f1;
+            color: #dc2626;
+        }
+
+
+            .logout-item:hover i {
+                color: #dc2626 !important;
+            }
+
+
+        /* =====================================================
+                   LOGIN
+                ===================================================== */
+
+        .account-login-link {
+            text-decoration: none;
+            color: #334155;
+            font-size: 15px;
+        }
+
+
+            .account-login-link:hover {
+                color: #2563eb;
+            }
+
+
+        /* =====================================================
+                   MAIN
+                ===================================================== */
+
+        .main {
+            padding: 35px 8%;
+        }
+
+
+        .page-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+
+        .page-sub {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+
+        /* =====================================================
+                   PANEL
+                ===================================================== */
+
+        .panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+
+        /* =====================================================
+                   BUTTON
+                ===================================================== */
+
+        .btn-main {
+            background: #2563eb;
+            border: none;
+            color: white;
+        }
+
+
+            .btn-main:hover {
+                background: #1d4ed8;
+                color: white;
+            }
+
+
+        /* =====================================================
+                   DOCUMENT ITEM
+                ===================================================== */
+
+        .doc-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: white;
+        }
+
+
+            .doc-item:hover {
+                border-color: #cbd5e1;
+                background: #fcfdff;
+            }
+
+
+        .doc-icon {
+            font-size: 26px;
+            margin-right: 14px;
+        }
+
+
+        .doc-name {
+            font-weight: bold;
+            word-break: break-word;
+        }
+
+
+        .doc-meta {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+
+        /* =====================================================
+                   EMPTY
+                ===================================================== */
+
+        .empty-box {
+            background: white;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+                   RESPONSIVE
+                ===================================================== */
+
+        @@media (max-width: 1000px) {
+
+            .navbar-custom {
+                padding: 0 20px;
+            }
+
+
+            .nav-link-custom {
+                margin-right: 12px;
+                font-size: 14px;
+            }
+
+
+            .logo {
+                margin-right: 20px;
+            }
+
+
+            .account-name {
+                max-width: 120px;
+            }
+
+
+            .main {
+                padding: 30px 20px;
+            }
+        }
+
+
+        @@media (max-width: 750px) {
+
+            .navbar-custom {
+                height: auto;
+                min-height: 70px;
+                padding: 12px 15px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+
+            .logo {
+                margin-right: 15px;
+            }
+
+
+            .nav-link-custom {
+                display: none;
+            }
+
+
+            .account-area {
+                margin-left: auto;
+            }
+
+
+            .account-name {
+                display: none;
+            }
+
+
+            .doc-item {
+                align-items: flex-start;
+            }
+
+
+                .doc-item > div:last-child {
+                    width: 100%;
+                }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <nav class="navbar-custom">
+
+
+        <!-- LOGO -->
+
+        <a href="/"
+           class="logo">
+
+            E-Learning
+
+        </a>
+
+
+        <!-- TRANG CHỦ -->
+
+        <a href="/"
+           class="nav-link-custom">
+
+            @(isEn ? "Home" : "Trang chủ")
+
+        </a>
+
+
+        <!-- CHUYÊN MỤC -->
+
+        <a href="/Lesson"
+           class="nav-link-custom">
+
+            @(isEn ? "Categories" : "Chuyên mục")
+
+        </a>
+
+
+        <!-- KHÓA HỌC CỦA TÔI -->
+
+        <a asp-controller="Learning"
+           asp-action="MyCourses"
+           class="nav-link-custom">
+
+            @(isEn ? "My Courses" : "Khóa học của tôi")
+
+        </a>
+
+
+        <!-- KẾT QUẢ -->
+
+        <a asp-controller="Learning"
+           asp-action="Results"
+           class="nav-link-custom">
+
+            @(isEn ? "My Results" : "Kết quả học tập")
+
+        </a>
+
+
+        <!-- TRA CỨU ĐIỂM -->
+
+        <a asp-controller="Learning"
+           asp-action="LookupScore"
+           class="nav-link-custom">
+
+            @(isEn ? "Score Lookup" : "Tra cứu điểm")
+
+        </a>
+
+
+        <!-- =================================================
+             ACCOUNT
+        ================================================= -->
+
+        <div class="account-area">
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="account-dropdown">
+
+
+                    <!-- NÚT TÀI KHOẢN -->
+
+                    <button type="button"
+                            class="account-button"
+                            id="accountButton">
+
+                        <span class="account-avatar">
+
+                            @avatarLetter
+
+                        </span>
+
+
+                        <span class="account-name">
+
+                            @displayName
+
+                        </span>
+
+
+                        <i class="bi bi-chevron-down account-arrow"></i>
+
+                    </button>
+
+
+                    <!-- =================================================
+                         MENU
+                    ================================================= -->
+
+                    <div class="account-menu"
+                         id="accountMenu">
+
+
+                        <!-- HỒ SƠ -->
+
+                        <a asp-controller="Account"
+                           asp-action="Profile"
+                           class="account-menu-item">
+
+                            <i class="bi bi-person"></i>
+
+                            <span>
+                                @(isEn ? "Profile" : "Hồ sơ")
+                            </span>
+
+                        </a>
+
+
+                        <!-- KẾT QUẢ -->
+
+                        <a asp-controller="Learning"
+                           asp-action="Results"
+                           class="account-menu-item">
+
+                            <i class="bi bi-file-earmark-text"></i>
+
+                            <span>
+                                @(isEn
+                                    ? "My Results"
+                                    : "Kết quả học tập")
+                            </span>
+
+                        </a>
+
+
+                        <!-- LỊCH -->
+
+                        <a asp-controller="Learning"
+                           asp-action="Schedule"
+                           class="account-menu-item">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            <span>
+                                @(isEn
+                                    ? "Schedule"
+                                    : "Lịch học")
+                            </span>
+
+                        </a>
+
+
+                        <!-- TÀI LIỆU -->
+
+                        <a asp-controller="Learning"
+                           asp-action="Documents"
+                           class="account-menu-item">
+
+                            <i class="bi bi-folder-plus"></i>
+
+                            <span>
+                                @(isEn
+                                    ? "My Documents"
+                                    : "Tài liệu cá nhân")
+                            </span>
+
+                        </a>
+
+
+                        <!-- BÁO CÁO -->
+
+                        <a asp-controller="Learning"
+                           asp-action="Report"
+                           class="account-menu-item">
+
+                            <i class="bi bi-file-text"></i>
+
+                            <span>
+                                @(isEn
+                                    ? "Academic Report"
+                                    : "Báo cáo học tập")
+                            </span>
+
+                        </a>
+
+
+                        <!-- ĐƯỜNG KẺ -->
+
+                        <div class="account-divider"></div>
+
+
+                        <!-- CÀI ĐẶT -->
+
+                        <a asp-controller="Account"
+                           asp-action="Settings"
+                           class="account-menu-item">
+
+                            <i class="bi bi-sliders"></i>
+
+                            <span>
+                                @(isEn
+                                    ? "Settings"
+                                    : "Cài đặt")
+                            </span>
+
+                        </a>
+
+
+                        <!-- =================================================
+                             NGÔN NGỮ
+                        ================================================= -->
+
+                        <div class="account-menu-item language-item">
+
+                            <i class="bi bi-translate"></i>
+
+
+                            <span class="language-title">
+
+                                @(isEn ? "Language" : "Ngôn ngữ")
+
+                            </span>
+
+
+                            <span class="language-buttons">
+
+
+                                <!-- VI -->
+
+                                <a href="@Url.Action(
+                                    "SetLanguage",
+                                    "Account",
+                                    new
+                                    {
+                                        lang = "vi",
+                                        returnUrl = Context.Request.Path
+                                    })"
+                                   class="language-btn
+                                          @(!isEn
+                                              ? "active"
+                                              : "inactive")">
+
+                                    VI
+
+                                </a>
+
+
+                                <!-- EN -->
+
+                                <a href="@Url.Action(
+                                    "SetLanguage",
+                                    "Account",
+                                    new
+                                    {
+                                        lang = "en",
+                                        returnUrl = Context.Request.Path
+                                    })"
+                                   class="language-btn
+                                          @(isEn
+                                              ? "active"
+                                              : "inactive")">
+
+                                    EN
+
+                                </a>
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- ĐƯỜNG KẺ -->
+
+                        <div class="account-divider"></div>
+
+
+                        <!-- ĐĂNG XUẤT -->
+
+                        <a asp-controller="Account"
+                           asp-action="Logout"
+                           class="account-menu-item logout-item">
+
+                            <i class="bi bi-box-arrow-right"></i>
+
+                            <span>
+
+                                @(isEn
+                                    ? "Log out"
+                                    : "Đăng xuất")
+
+                            </span>
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <!-- CHƯA ĐĂNG NHẬP -->
+
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="account-login-link">
+
+                    @(isEn
+                        ? "Account"
+                        : "Tài khoản")
+
+                </a>
+            }
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
+
+    <div class="main">
+
+
+        <!-- TIÊU ĐỀ -->
+
+        <div class="page-title">
+
+            @(isEn ? "My Documents" : "Tài liệu cá nhân")
+
+        </div>
+
+
+        <!-- MÔ TẢ -->
+
+        <div class="page-sub">
+
+            @(isEn
+                ? "Store and manage your private documents. Only you can view them."
+                : "Lưu trữ và quản lý các tệp tài liệu riêng của bạn (chỉ bạn xem được).")
+
+        </div>
+
+
+
+        <!-- =================================================
+             SUCCESS
+        ================================================= -->
+        @if (!string.IsNullOrEmpty(success))
+        {
+
+            <div class="alert alert-success">
+
+                <i class="bi bi-check-circle"></i>
+
+                @success
+
+            </div>
+
+        }
+
+
+
+        <!-- =================================================
+             ERROR
+        ================================================= -->
+        @if (!string.IsNullOrEmpty(error))
+        {
+
+            <div class="alert alert-danger">
+
+                <i class="bi bi-exclamation-triangle"></i>
+
+                @error
+
+            </div>
+
+        }
+
+
+
+        <!-- =================================================
+             UPLOAD
+        ================================================= -->
+
+        <div class="panel mb-4">
+
+
+            <h6 class="fw-bold mb-3">
+
+                @(isEn
+                    ? "Upload document"
+                    : "Tải tài liệu lên")
+
+            </h6>
+
+
+            <form asp-controller="Learning"
+                  asp-action="UploadDocument"
+                  method="post"
+                  enctype="multipart/form-data">
+
+
+                @Html.AntiForgeryToken()
+
+
+                <div class="row g-3 align-items-end">
+
+
+                    <!-- FILE -->
+
+                    <div class="col-md-5">
+
+                        <label class="form-label">
+
+                            @(isEn
+                                ? "Choose file (maximum 20MB)"
+                                : "Chọn tệp (tối đa 20MB)")
+
+                        </label>
+
+
+                        <input type="file"
+                               name="file"
+                               class="form-control"
+                               required />
+
+                    </div>
+
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="col-md-5">
+
+                        <label class="form-label">
+
+                            @(isEn
+                                ? "Description (optional)"
+                                : "Ghi chú (tùy chọn)")
+
+                        </label>
+
+
+                        <input type="text"
+                               name="description"
+                               class="form-control"
+                               placeholder="@(isEn ? "Example: Chapter 3 assignment" : "VD: Bài tập chương 3")" />
+
+                    </div>
+
+
+
+                    <!-- BUTTON -->
+
+                    <div class="col-md-2">
+
+                        <button type="submit"
+                                class="btn btn-main w-100">
+
+                            <i class="bi bi-upload"></i>
+
+                            @(isEn ? "Upload" : "Tải lên")
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- =================================================
+             DOCUMENT LIST
+        ================================================= -->
+
+        <div class="panel">
+
+
+            <h6 class="fw-bold mb-3">
+
+                @(isEn
+                    ? $"My Documents ({Model.Count()})"
+                    : $"Tài liệu của tôi ({Model.Count()})")
+
+            </h6>
+
+
+            @if (Model.Any())
+            {
+
+                @foreach (var doc in Model)
+                {
+
+                    var ext =
+                    System.IO.Path
+                    .GetExtension(doc.FileName)
+                    .ToLowerInvariant();
+
+
+                    var icon =
+                    ext switch
+                    {
+                        ".pdf" => "📕",
+
+                        ".doc" or ".docx" => "📘",
+
+                        ".xls" or ".xlsx" => "📗",
+
+                        ".ppt" or ".pptx" => "📙",
+
+                        ".zip" or ".rar" => "🗜️",
+
+                        ".jpg"
+                or ".jpeg"
+                or ".png"
+                or ".gif"
+                => "🖼️",
+
+                        _ => "📄"
+                    };
+
+
+                    var sizeKb =
+                    doc.FileSize / 1024.0;
+
+
+                    var sizeText =
+                    sizeKb >= 1024
+
+                    ? (sizeKb / 1024.0)
+                    .ToString("0.0")
+                    + " MB"
+
+                    : sizeKb
+                    .ToString("0")
+                    + " KB";
+
+
+                    <div class="doc-item">
+
+
+                        <!-- THÔNG TIN -->
+
+                        <div class="d-flex align-items-center"
+                             style="min-width:0; flex:1;">
+
+
+                            <div class="doc-icon">
+
+                                @icon
+
+                            </div>
+
+
+                            <div style="min-width:0;">
+
+
+                                <div class="doc-name">
+
+                                    @doc.FileName
+
+                                </div>
+
+
+                                <div class="doc-meta">
+
+                                    @sizeText
+                                    •
+                                    @(isEn ? "Uploaded" : "Tải lên")
+                                    @doc.UploadedAt.ToString("dd/MM/yyyy HH:mm")
+
+
+                                    @if (!string.IsNullOrEmpty(doc.Description))
+                                    {
+
+                                        <span>
+
+                                            • @doc.Description
+
+                                        </span>
+
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ACTIONS -->
+
+                        <div>
+
+
+                            <!-- DOWNLOAD -->
+
+                            <a href="@doc.FilePath"
+                               download="@doc.FileName"
+                               class="btn btn-sm btn-outline-primary me-2">
+
+                                <i class="bi bi-download"></i>
+
+                                @(isEn ? "Download" : "Tải xuống")
+
+                            </a>
+
+
+                            <!-- DELETE -->
+
+                            <a asp-controller="Learning"
+                               asp-action="DeleteDocument"
+                               asp-route-id="@doc.Id"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('@(isEn ? "Delete this document?" : "Xóa tài liệu này?")');">
+
+                                <i class="bi bi-trash"></i>
+
+                                @(isEn ? "Delete" : "Xóa")
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            }
+            else
+            {
+
+                <!-- EMPTY -->
+
+                <div class="empty-box">
+
+
+                    <div style="font-size:42px;"
+                         class="mb-2">
+
+                        📁
+
+                    </div>
+
+
+                    <div>
+
+                        @(isEn
+                            ? "You do not have any documents yet."
+                            : "Bạn chưa có tài liệu nào.")
+
+                    </div>
+
+
+                    <div class="mt-1">
+
+                        @(isEn
+                            ? "Upload your first file above."
+                            : "Hãy tải lên tệp đầu tiên của bạn ở trên.")
+
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         AI TUTOR
+    ===================================================== -->
+    @{
+        var tutorCtx =
+        new ChatWidgetModel
+            {
+                ContextLabel =
+            isEn
+            ? "Ask about documents and lesson content"
+            : "Hỏi về tài liệu và nội dung bài học"
+            };
+    }
+
+
+    @await Html.PartialAsync(
+            "_AiTutorWidget",
+            tutorCtx
+            )
+
+
+
+    <!-- =====================================================
+         ACCOUNT JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+        const accountButton =
+            document.getElementById("accountButton");
+
+        const accountMenu =
+            document.getElementById("accountMenu");
+
+
+        if (accountButton && accountMenu) {
+
+            accountButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    accountMenu.classList.toggle("show");
+
+                }
+            );
+
+
+            document.addEventListener(
+                "click",
+                function () {
+
+                    accountMenu.classList.remove("show");
+
+                }
+            );
+
+        }
+
+    </script>
+
+
+
+    <!-- =====================================================
+         BOOTSTRAP JS
+    ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+
+</html>

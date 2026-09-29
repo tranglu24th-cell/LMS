@@ -1,0 +1,549 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="@ViewBag.Keywords" name="keywords">
+    <meta content="@ViewBag.Description" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Playball&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/lib/owlcarousel/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/css/bootstrap.min.css?v=elearn2" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/css/style.css?v=elearn2" rel="stylesheet">
+	@await RenderSectionAsync("Css", required: false)
+    <style>
+        /* ================================
+           FOOTER
+           ================================ */
+
+        .site-footer {
+            background: #172033;
+            color: white;
+            padding: 50px 8% 25px;
+        }
+
+        .site-footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 50px;
+        }
+
+        .footer-brand h2 {
+            color: #60a5fa;
+            font-size: 46px;
+            font-weight: 400;
+            margin-bottom: 25px;
+        }
+
+        .footer-brand p {
+            color: #cbd5e1;
+            font-size: 18px;
+            line-height: 1.8;
+            max-width: 600px;
+        }
+
+        .footer-column h3 {
+            color: white;
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 25px;
+        }
+
+        .footer-column a {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 18px;
+            margin-bottom: 18px;
+            transition: 0.2s;
+        }
+
+            .footer-column a:hover {
+                color: #60a5fa;
+            }
+
+        .footer-column p {
+            color: #cbd5e1;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+            .footer-column p i {
+                color: #e83e8c;
+                font-size: 17px;
+                margin-right: 10px;
+            }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 55px auto 0;
+            padding-top: 28px;
+            border-top: 1px solid #374151;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @@media (max-width: 900px) {
+            .site-footer-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 35px;
+            }
+        }
+
+        @@media (max-width: 600px) {
+            .site-footer {
+                padding: 40px 25px 20px;
+            }
+
+            .site-footer-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .footer-brand h2 {
+                font-size: 36px;
+            }
+
+            .footer-column h3 {
+                font-size: 26px;
+            }
+        }
+        /* ================================
+               MENU TÀI KHOẢN LMS
+               ================================ */
+
+        .lms-user-dropdown {
+            position: relative;
+        }
+
+        /* Nút avatar */
+        .lms-user-button {
+            border: none;
+            background: transparent;
+            padding: 2px 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+            .lms-user-button:focus {
+                outline: none;
+                box-shadow: none;
+            }
+
+        /* Avatar */
+        .lms-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #527da8;
+            border: 2px solid #dce5ed;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Mũi tên */
+        .lms-arrow {
+            font-size: 18px;
+            color: #222;
+            line-height: 1;
+        }
+
+        /* Dropdown */
+        .lms-user-menu {
+            width: 295px;
+            padding: 0;
+            margin-top: 8px;
+            background: #fff;
+            border: 1px solid #e2e2e2;
+            border-radius: 5px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        /* Từng dòng */
+        .lms-menu-item {
+            height: 64px;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            gap: 17px;
+            color: #171717;
+            font-size: 17px;
+            text-decoration: none;
+            background: #fff;
+        }
+
+            /* Icon */
+            .lms-menu-item > i {
+                width: 24px;
+                text-align: center;
+                font-size: 21px;
+                color: #222;
+            }
+
+            /* Hover */
+            .lms-menu-item:hover {
+                background: #f5f6f7;
+                color: #171717;
+                text-decoration: none;
+            }
+
+        /* Đường kẻ */
+        .lms-menu-divider {
+            height: 1px;
+            background: #e5e5e5;
+        }
+
+        /* Language */
+        .lms-language {
+            position: relative;
+        }
+
+        .lms-language-arrow {
+            margin-left: auto;
+            width: auto !important;
+            font-size: 13px !important;
+        }
+
+        /* Log out */
+        .lms-user-menu .lms-menu-item:last-child {
+            height: 70px;
+        }
+        /* Không cho chữ menu xuống dòng */
+        .navbar-nav {
+            flex-wrap: nowrap;
+        }
+
+            .navbar-nav .nav-link {
+                white-space: nowrap !important;
+                flex-shrink: 0;
+            }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+    <!-- Navbar start -->
+    <div class="container-fluid nav-bar">
+        <div class="container">
+            <nav class="navbar navbar-light navbar-expand-lg py-4">
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand">
+                    <h1 class="text-primary fw-bold mb-0">E-<span class="text-dark">Learning</span> </h1>
+                </a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="@Url.Action("Index", "Home")" class="nav-item nav-link active">Trang chủ</a>
+
+                        <a href="@Url.Action("About", "Home")" class="nav-item nav-link">Giới thiệu</a>
+                        <a href="@Url.Action("Index", "Lesson")" class="nav-item nav-link">Chuyên mục</a>
+                        <a href="@Url.Action("MyCourses", "Learning")" class="nav-item nav-link">Khóa học của tôi</a>
+                        <a href="@Url.Action("LookupScore", "Learning")" class="nav-item nav-link">Tra cứu điểm</a>
+                        <a href="@Url.Action("Index", "Contact")" class="nav-item nav-link">Góp Ý</a>
+                    </div>
+                    <div class="d-flex align-items-center dynamic-header-actions">
+
+                        @* ================= 1. KHU VỰC MENU TÀI KHOẢN (BOOTSTRAP 5) ================= *@
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="dropdown lms-user-dropdown me-2">
+
+                                <!-- NÚT AVATAR -->
+                                <button class="lms-user-button"
+                                        type="button"
+                                        id="userMenu"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+
+                                    <div class="lms-avatar">
+                                        @User.Identity.Name?.Substring(0, 1).ToUpper()
+                                    </div>
+
+                                    <span class="lms-arrow">⌄</span>
+
+                                </button>
+
+
+                                <!-- MENU SỔ XUỐNG -->
+                                <div class="dropdown-menu dropdown-menu-end lms-user-menu"
+                                     aria-labelledby="userMenu">
+
+                                    <!-- PROFILE -->
+                                    <a class="lms-menu-item"
+                                       href="@Url.Action("Profile", "Account")">
+
+                                        <i class="far fa-user"></i>
+
+                                        <span>Hồ sơ</span>
+
+                                    </a>
+
+
+                                    <!-- GRADES -->
+                                    <a class="lms-menu-item"
+                                       href="/Learning/Results">
+
+                                        <i class="far fa-file-alt"></i>
+
+                                        <span>Kết quả học tập</span>
+
+                                    </a>
+
+
+                                    <!-- CALENDAR -->
+                                    <a class="lms-menu-item"
+                                       href="@Url.Action("Schedule", "Learning")">
+
+                                        <i class="far fa-calendar-alt"></i>
+
+                                        <span>Lịch học</span>
+
+                                    </a>
+
+
+                                    <!-- PRIVATE FILES -->
+                                    <a class="lms-menu-item"
+                                       href="@Url.Action("Documents", "Learning")">
+
+                                        <i class="far fa-folder-open"></i>
+
+                                        <span>Tài liệu cá nhân</span>
+
+                                    </a>
+
+
+                                    <!-- REPORTS -->
+                                    <a class="lms-menu-item"
+                                       href="@Url.Action("Report", "Learning")">
+
+                                        <i class="far fa-file"></i>
+
+                                        <span>Báo cáo học tập</span>
+
+                                    </a>
+
+
+                                    <!-- ĐƯỜNG KẺ -->
+                                    <div class="lms-menu-divider"></div>
+
+
+                                    <!-- PREFERENCES -->
+                                    <a class="lms-menu-item"
+                                       href="@Url.Action("Settings", "Account")">
+
+                                        <i class="fas fa-sliders-h"></i>
+
+                                        <span>Cài đặt</span>
+
+                                    </a>
+
+
+                                    <!-- LANGUAGE -->
+                                    <div class="lms-menu-item lms-language" style="cursor:default;">
+
+                                        <i class="fas fa-language"></i>
+
+                                        <span>Ngôn ngữ</span>
+
+                                        <span style="margin-left:auto; display:flex; gap:6px;">
+                                            <a href="@Url.Action("SetLanguage", "Account", new { lang = "vi", returnUrl = Context.Request.Path.ToString() })"
+                                               style="font-size:12px; padding:2px 8px; border-radius:6px; text-decoration:none; @(Context.Request.Cookies["lang"] != "en" ? "background:#2563eb;color:#fff;" : "background:#f1f5f9;color:#334155;")">VI</a>
+                                            <a href="@Url.Action("SetLanguage", "Account", new { lang = "en", returnUrl = Context.Request.Path.ToString() })"
+                                               style="font-size:12px; padding:2px 8px; border-radius:6px; text-decoration:none; @(Context.Request.Cookies["lang"] == "en" ? "background:#2563eb;color:#fff;" : "background:#f1f5f9;color:#334155;")">EN</a>
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- ĐƯỜNG KẺ -->
+                                    <div class="lms-menu-divider"></div>
+
+
+                                    <!-- LOG OUT -->
+                                    <a class="lms-menu-item"
+                                       href="@Url.Action("Logout", "Account")"
+                                       onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?')">
+
+                                        <i class="fas fa-sign-out-alt"></i>
+
+                                        <span>Đăng xuất</span>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="/Account/Login"
+                               class="btn btn-sm btn-outline-secondary rounded-circle p-2 me-2"
+                               title="Đăng nhập"
+                               style="width: 38px; height: 38px; line-height: 20px;">
+
+                                <i class="fas fa-user"></i>
+
+                            </a>
+                        }
+
+                        @* ================= 2. NÚT VÀO ADMIN CỦA BẠN (CỐ ĐỊNH) ================= *@
+                        <a href="/Admin/Member/Login" class="btn btn-sm btn-dark rounded-circle p-2 me-2" title="Cổng đăng nhập hệ thống Admin" style="width: 38px; height: 38px; line-height: 20px;">
+                            <i class="fas fa-lock"></i>
+                        </a>
+
+                        
+
+                    </div> @* <-- Thẻ đóng div tổng của class dynamic-header-actions, đảm bảo cân bằng cấu trúc *@
+
+                    <button class="btn-search btn btn-primary btn-md-square me-4 rounded-circle d-none d-lg-inline-flex" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button>
+                    <a href="@Url.Action("Index", "Lesson")" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Khám phá khóa học</a>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
+	@RenderBody()
+    <!-- Footer Start -->
+    <footer class="site-footer">
+        <div class="site-footer-container">
+
+            <!-- Cột 1 -->
+            <div class="footer-column footer-brand">
+                <h2>E-Learning</h2>
+                <p>
+                    Nền tảng học trực tuyến giúp sinh viên học tập,
+                    trao đổi kiến thức và theo dõi kết quả học tập.
+                </p>
+            </div>
+
+            <!-- Cột 2 -->
+            <div class="footer-column">
+                <h3>Liên kết</h3>
+
+                <a asp-controller="Home" asp-action="Index">
+                    Trang chủ
+                </a>
+
+                <a asp-controller="Lesson" asp-action="Index">
+                    Khóa học
+                </a>
+
+                <a asp-controller="Learning" asp-action="MyCourses">
+                    Khóa học của tôi
+                </a>
+
+                <a asp-controller="Learning" asp-action="Results">
+                    Kết quả học tập
+                </a>
+            </div>
+
+            <!-- Cột 3 -->
+            <div class="footer-column">
+                <h3>Hỗ trợ</h3>
+
+                <a asp-controller="Contact" asp-action="Index">
+                    Góp ý
+                </a>
+
+                <a asp-controller="Account" asp-action="Login">
+                    Đăng nhập
+                </a>
+
+                <a asp-controller="Account" asp-action="Register">
+                    Đăng ký
+                </a>
+            </div>
+
+            <!-- Cột 4 -->
+            <div class="footer-column">
+                <h3>Liên hệ</h3>
+
+                <p>
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Tây Ninh, Việt Nam
+                </p>
+
+                <p>
+                    <i class="bi bi-telephone-fill"></i>
+                    0854848058
+                </p>
+
+                <p>
+                    <i class="bi bi-envelope"></i>
+                    contact@e-learning.com
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Dòng cuối -->
+        <div class="footer-bottom">
+            © 2026 E-Learning - Hệ thống học tập trực tuyến
+        </div>
+    </footer>
+    <!-- Footer End -->
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-md-square btn-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/lib/wow/wow.min.js"></script>
+    <script src="/lib/easing/easing.min.js"></script>
+    <script src="/lib/waypoints/waypoints.min.js"></script>
+    <script src="/lib/counterup/counterup.min.js"></script>
+    <script src="/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+	@await RenderSectionAsync("Js", required: false)
+   
+   
+    <!-- Template Javascript -->
+    <script src="/js/main.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+
+
+    <!-- ============ AI TUTOR CHATBOT WIDGET ============ -->
+    @{
+        var tutorCtx = new ChatWidgetModel();
+    }
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+</body>
+</html>

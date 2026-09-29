@@ -1,0 +1,990 @@
+﻿@model IEnumerable<Web.Models.EF.Grade>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Tra cứu điểm";
+
+    var student = ViewBag.Student as Web.Models.EF.User;
+    var error = ViewBag.Error as string;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>Tra cứu điểm - E-Learning</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 35px;
+        }
+
+        .nav-item {
+            margin-right: 25px;
+            font-size: 15px;
+            color: #334155;
+            text-decoration: none;
+        }
+
+            .nav-item:hover {
+                color: #2563eb;
+            }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            padding: 0 25px 30px 25px;
+        }
+
+        /* ================= TITLE ================= */
+
+        .page-header {
+            background: #08b5c9;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+        }
+
+        /* ================= TRA CỨU ĐIỂM ================= */
+
+        .lookup-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 25px;
+        }
+
+        .lookup-subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-top: 8px;
+            margin-bottom: 30px;
+        }
+
+        .lookup-options {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 35px;
+        }
+
+        .lookup-card {
+            width: 280px;
+            min-height: 160px;
+            border: none;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: 0.25s;
+            padding: 25px;
+        }
+
+            .lookup-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            }
+
+            .lookup-card .icon {
+                font-size: 32px;
+                margin-bottom: 12px;
+            }
+
+            .lookup-card .title {
+                font-size: 18px;
+                font-weight: 700;
+                color: #1e293b;
+            }
+
+            .lookup-card .desc {
+                margin-top: 8px;
+                font-size: 14px;
+                color: #64748b;
+            }
+
+        /* ================= TABS ================= */
+
+        .score-tabs {
+            display: flex;
+            width: 100%;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 25px;
+        }
+
+        .score-tab {
+            width: 50%;
+            text-align: center;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #777;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            text-decoration: none;
+        }
+
+            .score-tab.active {
+                color: #222;
+                border: 2px solid #222;
+                border-top: 3px solid #dc2454;
+                background: white;
+            }
+
+        /* ================= SCORE BOX ================= */
+
+        .score-box {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        /* ================= SEMESTER ================= */
+
+        .semester-search {
+            display: flex;
+            height: 45px;
+            margin-bottom: 18px;
+            width: 730px;
+        }
+
+        .semester-label {
+            width: 95px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #fafafa;
+        }
+
+        .semester-select {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 0 20px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-score {
+            width: 55px;
+            border: none;
+            background: #2196f3;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+            .search-score:hover {
+                background: #1976d2;
+            }
+
+        /* ================= TABLE ================= */
+
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            background: white;
+        }
+
+            .score-table th,
+            .score-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+            .score-table th {
+                font-weight: bold;
+                background: white;
+                vertical-align: middle;
+            }
+
+            .score-table td {
+                font-size: 15px;
+            }
+
+                .score-table th:nth-child(2),
+                .score-table td:nth-child(2) {
+                    text-align: left;
+                }
+
+        .subject-name {
+            text-align: left;
+        }
+
+        /* ================= NOTE ================= */
+
+        .score-note {
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 10px;
+        }
+
+            .score-note span {
+                color: red;
+                font-size: 20px;
+            }
+
+        /* ================= EMPTY ================= */
+
+        .empty-score {
+            padding: 25px !important;
+            color: #777;
+            text-align: center !important;
+        }
+
+        /* ================= AVERAGE ================= */
+
+        .average-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 15px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <div class="navbar">
+
+        <a href="/" class="logo">
+            E-Learning
+        </a>
+
+        <a href="/Lesson" class="nav-item">
+            Chuyên mục
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="MyCourses"
+           class="nav-item">
+            Khóa học của tôi
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="Results"
+           class="nav-item">
+            Kết quả học tập
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="Schedule"
+           class="nav-item">
+            Lịch học
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="Documents"
+           class="nav-item">
+            Tài liệu
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="Report"
+           class="nav-item">
+            Báo cáo
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="LookupScore"
+           class="nav-item"
+           style="color:#2563eb;font-weight:bold;">
+            Tra cứu điểm
+        </a>
+
+        <div style="margin-left:auto;">
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span style="color:#334155;">
+                    @User.Identity.Name
+                </span>
+
+                <a asp-controller="Account"
+                   asp-action="Logout"
+                   class="nav-item"
+                   style="margin-left:20px;">
+                    Đăng xuất
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="nav-item">
+                    Đăng nhập
+                </a>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <div class="main">
+
+        <!-- ================= TRANG LỰA CHỌN ================= -->
+
+        <div id="lookupHome">
+
+            <div class="page-header">
+                TRA CỨU ĐIỂM
+            </div>
+
+            <div class="lookup-title">
+                Tra cứu điểm
+            </div>
+
+            <div class="lookup-subtitle">
+                Vui lòng chọn nội dung bạn muốn xem
+            </div>
+
+            <div class="lookup-options">
+
+                <button type="button"
+                        class="lookup-card"
+                        onclick="openLookup('score')">
+
+                    <div class="icon">
+                        📊
+                    </div>
+
+                    <div class="title">
+                        Xem điểm
+                    </div>
+
+                    <div class="desc">
+                        Xem bảng điểm học kỳ và điểm cá nhân
+                    </div>
+
+                </button>
+
+
+                <button type="button"
+                        class="lookup-card"
+                        onclick="openLookup('movement')">
+
+                    <div class="icon">
+                        🏆
+                    </div>
+
+                    <div class="title">
+                        Điểm phong trào
+                    </div>
+
+                    <div class="desc">
+                        Xem điểm hoạt động và phong trào
+                    </div>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= NỘI DUNG XEM ĐIỂM ================= -->
+
+        <div id="scoreContent" style="display:none;">
+
+            <div class="page-header">
+                XEM BẢNG ĐIỂM
+            </div>
+
+
+            <!-- NÚT NHẬP ĐIỂM -->
+            @if (User.IsInRole("Teacher"))
+            {
+                <div style="text-align: right; margin-bottom: 15px;">
+
+                    <a asp-controller="Learning"
+                       asp-action="EnterGrades"
+                       class="btn btn-primary">
+                        Nhập điểm
+                    </a>
+
+                </div>
+            }
+
+
+            <!-- ================= TABS ================= -->
+
+            <div class="score-tabs">
+
+                <button type="button"
+                        class="score-tab"
+                        id="btnSemester"
+                        onclick="showScoreTab('semester')">
+                    BẢNG ĐIỂM HỌC KỲ
+                </button>
+
+                <button type="button"
+                        class="score-tab active"
+                        id="btnPersonal"
+                        onclick="showScoreTab('personal')">
+                    BẢNG ĐIỂM CÁ NHÂN
+                </button>
+
+            </div>
+
+
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger">
+                    @error
+                </div>
+            }
+
+
+            @if (student != null)
+            {
+
+                <!-- ================= BẢNG ĐIỂM HỌC KỲ ================= -->
+
+                <div id="semesterTab"
+                     class="score-tab-content"
+                     style="display:none;">
+
+                    <div class="score-box">
+
+                        <div class="semester-search">
+
+                            <div class="semester-label">
+                                HỌC KỲ
+                            </div>
+
+                            <select id="semesterSelect"
+                                    class="semester-select">
+
+                                <option value="HK1">HK1</option>
+                                <option value="HK2">HK2</option>
+                                <option value="HK3">HK3</option>
+                                <option value="HK4">HK4</option>
+                                <option value="HK5">HK5</option>
+                                <option value="HK6">HK6</option>
+
+                            </select>
+
+                            <button type="button"
+                                    class="search-score"
+                                    onclick="searchSemester()">
+                                🔍
+                            </button>
+
+                        </div>
+
+
+                        <table class="score-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Môn</th>
+                                    <th>CC<br />(10%)</th>
+                                    <th>GK<br />(30%)</th>
+                                    <th>CK<br />(60%)</th>
+                                    <th>TB</th>
+                                    <th>ĐIỂM<br />4</th>
+                                    <th>Loại</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @if (Model != null && Model.Any())
+                                {
+
+                                    foreach (var grade in Model)
+                                    {
+
+                                        var score =
+                                        grade.CC * 0.10 +
+                                        grade.GK * 0.30 +
+                                        grade.CK * 0.60;
+
+                                        var score4 =
+                                        score >= 8.5 ? 4 :
+                                        score >= 7.0 ? 3 :
+                                        score >= 5.5 ? 2 :
+                                        score >= 4.0 ? 1 : 0;
+
+                                        var letter =
+                                        score >= 8.5 ? "A" :
+                                        score >= 7.0 ? "B" :
+                                        score >= 5.5 ? "C" :
+                                        score >= 4.0 ? "D" : "F";
+
+
+                                        <tr>
+
+                                            <td class="subject-name">
+                                                @(grade.Course?.Title ?? "Môn học")
+                                            </td>
+
+                                            <td>
+                                                @(grade.CC > 0
+                                                    ? grade.CC.ToString("0.0")
+                                                    : "Đang cập nhật")
+                                            </td>
+
+                                            <td>
+                                                @(grade.GK > 0
+                                                    ? grade.GK.ToString("0.0")
+                                                    : "Đang cập nhật")
+                                            </td>
+
+                                            <td>
+                                                @(grade.CK > 0
+                                                    ? grade.CK.ToString("0.0")
+                                                    : "Đang cập nhật")
+                                            </td>
+
+
+                                            @if (grade.CC > 0 &&
+                                           grade.GK > 0 &&
+                                           grade.CK > 0)
+                                            {
+                                                <td>
+                                                    @score.ToString("0.0")
+                                                </td>
+
+                                                <td>
+                                                    @score4
+                                                </td>
+
+                                                <td>
+                                                    @letter
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>Đang cập nhật</td>
+                                                <td>Đang cập nhật</td>
+                                                <td>Đang cập nhật</td>
+                                            }
+
+                                        </tr>
+
+                                    }
+
+                                }
+                                else
+                                {
+
+                                    <tr>
+
+                                        <td colspan="7"
+                                            class="empty-score">
+                                            Chưa có điểm được cập nhật
+                                        </td>
+
+                                    </tr>
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+
+                        <div class="score-note">
+
+                            <span>(*)</span>
+                            Lưu ý:
+                            Bảng điểm chỉ mang tính chất tham khảo.
+                            Để nhận bảng điểm chính, vui lòng liên hệ Văn phòng Khoa.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= BẢNG ĐIỂM CÁ NHÂN ================= -->
+
+                <div id="personalTab"
+                     class="score-tab-content">
+
+                    <div class="score-box">
+
+                        <table class="score-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Môn Học</th>
+                                    <th>TC</th>
+                                    <th>TĐ 10</th>
+                                    <th>TĐ 4</th>
+                                    <th>ĐIỂM<br />CHỮ</th>
+                                    <th>GHI CHÚ</th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                <tr>
+
+                                    <td colspan="7"
+                                        style="font-weight:bold;">
+                                        NĂM HỌC 2024-2025
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+
+                                    <td colspan="7"
+                                        style="text-align:left;font-weight:bold;">
+                                        HỌC KỲ: 1
+                                    </td>
+
+                                </tr>
+
+
+                                @if (Model != null && Model.Any())
+                                {
+
+                                    int stt = 1;
+
+                                    foreach (var grade in Model)
+                                    {
+
+                                        var score =
+                                        grade.CC * 0.10 +
+                                        grade.GK * 0.30 +
+                                        grade.CK * 0.60;
+
+                                        var score4 =
+                                        score >= 8.5 ? 4 :
+                                        score >= 7.0 ? 3 :
+                                        score >= 5.5 ? 2 :
+                                        score >= 4.0 ? 1 : 0;
+
+                                        var letter =
+                                        score >= 8.5 ? "A" :
+                                        score >= 7.0 ? "B" :
+                                        score >= 5.5 ? "C" :
+                                        score >= 4.0 ? "D" : "F";
+
+
+                                        <tr>
+
+                                            <td>
+                                                @stt
+                                            </td>
+
+                                            <td class="subject-name">
+                                                @(grade.Course?.Title ?? "Môn học")
+                                            </td>
+
+                                            <td>
+                                                3
+                                            </td>
+
+
+                                            @if (grade.CC > 0 &&
+                                           grade.GK > 0 &&
+                                           grade.CK > 0)
+                                            {
+
+                                                <td>
+                                                    @score.ToString("0.0")
+                                                </td>
+
+                                                <td>
+                                                    @score4
+                                                </td>
+
+                                                <td>
+                                                    @letter
+                                                </td>
+
+                                            }
+                                            else
+                                            {
+
+                                                <td>Đang cập nhật</td>
+                                                <td>Đang cập nhật</td>
+                                                <td>Đang cập nhật</td>
+
+                                            }
+
+
+                                            <td>
+
+                                                @(string.IsNullOrEmpty(grade.Comment)
+                                                    ? ""
+                                                    : grade.Comment)
+
+                                            </td>
+
+                                        </tr>
+
+                                        stt++;
+
+                                    }
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+
+                        @if (Model != null && Model.Any())
+                        {
+
+                            var scoredGrades = Model
+                            .Where(x =>
+                            x.CC > 0 &&
+                            x.GK > 0 &&
+                            x.CK > 0)
+                            .ToList();
+
+
+                            if (scoredGrades.Any())
+                            {
+
+                                var averagePersonal =
+                                scoredGrades.Average(x =>
+                                x.CC * 0.10 +
+                                x.GK * 0.30 +
+                                x.CK * 0.60);
+
+
+                                var classification =
+                                averagePersonal >= 8.5 ? "Xuất sắc" :
+                                averagePersonal >= 8.0 ? "Giỏi" :
+                                averagePersonal >= 6.5 ? "Khá" :
+                                averagePersonal >= 5.0 ? "Trung bình" :
+                                "Yếu";
+
+
+                                <div class="average-row">
+
+                                    <div>
+
+                                        <strong>
+                                            TRUNG BÌNH TÍCH LŨY:
+                                        </strong>
+
+                                        @averagePersonal.ToString("0.00")
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <strong>
+                                            XẾP LOẠI:
+                                        </strong>
+
+                                        @classification
+
+                                    </div>
+
+                                </div>
+
+                            }
+
+                        }
+
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+
+
+        <!-- ================= ĐIỂM PHONG TRÀO ================= -->
+
+        <div id="movementContent" style="display:none;">
+
+            <div class="page-header">
+                ĐIỂM PHONG TRÀO
+            </div>
+
+            <div class="score-box">
+
+                <table class="score-table">
+                    <thead>
+                        <tr>
+                            <th>Tên Phong Trào</th>
+                            <th>Ngày</th>
+                            <th>Địa Điểm</th>
+                            <th>Ký Tên</th>
+                            <th>Điểm Số</th>
+                            <th>Ghi Chú</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= AI ================= -->
+    @{
+        var tutorCtx = new ChatWidgetModel
+            {
+                ContextLabel = "Giải thích khái niệm & thang điểm"
+            };
+    }
+
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+
+    <script>
+
+        /* ================= CHUYỂN TRANG TRA CỨU ================= */
+
+        function openLookup(type) {
+
+            const lookupHome =
+                document.getElementById("lookupHome");
+
+            const scoreContent =
+                document.getElementById("scoreContent");
+
+            const movementContent =
+                document.getElementById("movementContent");
+
+
+            lookupHome.style.display = "none";
+
+
+            if (type === "score") {
+
+                scoreContent.style.display = "block";
+                movementContent.style.display = "none";
+
+                showScoreTab("personal");
+
+            }
+            else if (type === "movement") {
+
+                scoreContent.style.display = "none";
+                movementContent.style.display = "block";
+
+            }
+
+        }
+
+
+        /* ================= CHUYỂN TAB ĐIỂM ================= */
+
+        function showScoreTab(tab) {
+
+            const semesterTab =
+                document.getElementById("semesterTab");
+
+            const personalTab =
+                document.getElementById("personalTab");
+
+            const btnSemester =
+                document.getElementById("btnSemester");
+
+            const btnPersonal =
+                document.getElementById("btnPersonal");
+
+
+            if (tab === "semester") {
+
+                semesterTab.style.display = "block";
+                personalTab.style.display = "none";
+
+                btnSemester.classList.add("active");
+                btnPersonal.classList.remove("active");
+
+            }
+            else {
+
+                semesterTab.style.display = "none";
+                personalTab.style.display = "block";
+
+                btnPersonal.classList.add("active");
+                btnSemester.classList.remove("active");
+
+            }
+
+        }
+
+
+        /* ================= TRA CỨU HỌC KỲ ================= */
+
+        function searchSemester() {
+
+            const semester =
+                document.getElementById("semesterSelect").value;
+
+            alert("Bạn đang tra cứu " + semester);
+
+        }
+
+    </script>
+
+</body>
+</html>

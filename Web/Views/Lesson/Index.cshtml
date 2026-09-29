@@ -1,0 +1,353 @@
+﻿@model IEnumerable<Web.Models.EF.Course>
+
+@{
+    ViewData["Title"] = "Khóa học";
+
+    var isEn =
+        Context.Request.Cookies["lang"] == "en";
+}
+
+<style>
+    /* CHỈ CSS CỦA TRANG KHÓA HỌC */
+
+    .main {
+        padding: 35px 8%;
+    }
+
+    .course-category-header {
+        margin-bottom: 25px;
+    }
+
+    .category-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+        color: #111827;
+    }
+
+    .category-tabs {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        height: 45px;
+        border-bottom: 1px solid #d1d5db;
+    }
+
+    .category-tab {
+        height: 45px;
+        display: flex;
+        align-items: center;
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 15px;
+        border-bottom: 2px solid #2563eb;
+    }
+
+    .course-search-area {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 22px 0 15px 0;
+        border-bottom: 1px solid #d1d5db;
+    }
+
+    .search-box {
+        width: 300px;
+        height: 44px;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+    }
+
+        .search-box i {
+            font-size: 19px;
+            color: #475569;
+            margin-right: 9px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+    .course-count {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .course-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        height: 100%;
+        transition: 0.2s;
+    }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+    .course-image {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+    }
+
+    .course-image-placeholder {
+        width: 100%;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        color: #2563eb;
+        font-size: 45px;
+    }
+
+    .course-body {
+        padding: 20px;
+    }
+
+    .badge-course {
+        display: inline-block;
+        background: #eef2f7;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .course-title {
+        font-size: 19px;
+        font-weight: bold;
+        min-height: 55px;
+        line-height: 1.4;
+    }
+
+    .teacher {
+        color: #64748b;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .course-description {
+        color: #64748b;
+        margin-top: 10px;
+        line-height: 1.6;
+        min-height: 45px;
+    }
+
+    .btn-course {
+        margin-top: 15px;
+        width: 100%;
+        border-radius: 6px;
+    }
+
+    .empty-state {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 60px 30px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-state-icon {
+        font-size: 50px;
+        color: #94a3b8;
+        margin-bottom: 15px;
+    }
+</style>
+
+
+<div class="main">
+
+    <div class="course-category-header">
+
+        <h1 class="category-title">
+            @(isEn ? "Courses" : "Khóa học")
+        </h1>
+
+        <div class="category-tabs">
+
+            <a href="/Lesson"
+               class="category-tab">
+
+                @(isEn ? "Categories" : "Danh mục")
+
+            </a>
+
+            <button type="button"
+                    class="category-more">
+                ...
+            </button>
+
+        </div>
+
+        <div class="course-search-area">
+
+            <div class="search-box">
+
+                <i class="bi bi-search"></i>
+
+                <input type="text"
+                       id="courseSearch"
+                       placeholder="@(isEn ? "Search courses" : "Tìm kiếm khóa học")" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="course-count">
+
+        @Model.Count()
+
+        @(isEn ? " Courses" : " Khóa học")
+
+    </div>
+
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var course in Model)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6 course-column">
+
+                    <div class="course-card"
+                         data-course-name="@course.Title.ToLowerInvariant()">
+
+                        @if (!string.IsNullOrWhiteSpace(course.Image))
+                        {
+                            <img src="@course.Image"
+                                 class="course-image"
+                                 alt="@course.Title" />
+                        }
+                        else
+                        {
+                            <div class="course-image-placeholder">
+                                <i class="bi bi-book"></i>
+                            </div>
+                        }
+
+                    <div class="course-body">
+
+                        <span class="badge-course">
+                            @(isEn ? "Course" : "Khóa học")
+                        </span>
+
+                        <div class="course-title">
+                            @course.Title
+                        </div>
+
+                        <div class="course-description">
+                            @(string.IsNullOrWhiteSpace(course.Description)
+                                                    ? (isEn
+                                                    ? "No description available for this course."
+                                                    : "Chưa có mô tả cho khóa học này.")
+                                                    : course.Description)
+                                                                     </div>
+
+                        <div class="teacher">
+
+                            <i class="bi bi-person"></i>
+
+                            @(course.Teacher?.FullName
+                                                    ?? course.Teacher?.Username
+                                                    ?? (isEn
+                                                    ? "Teacher not updated"
+                                                    : "Giảng viên chưa cập nhật"))
+
+                    </div>
+
+                            <a asp-controller="Lesson"
+                               asp-action="Details"
+                               asp-route-id="@course.Id"
+                               class="btn btn-primary btn-course">
+
+                                <i class="bi bi-eye"></i>
+
+                                @(isEn ? "View course" : "Xem khóa học")
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                }
+
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                <i class="bi bi-book"></i>
+            </div>
+
+            <h4>
+                @(isEn ? "No courses" : "Chưa có khóa học")
+            </h4>
+
+            <p>
+                @(isEn
+                            ? "There are currently no courses available on the system."
+                            : "Hiện tại chưa có khóa học nào được đăng trên hệ thống.")
+        </p>
+
+        </div>
+        }
+
+</div>
+
+
+<script>
+
+    const courseSearch =
+        document.getElementById("courseSearch");
+
+    if (courseSearch) {
+
+        courseSearch.addEventListener(
+            "input",
+            function () {
+
+                const keyword =
+                    this.value.trim().toLowerCase();
+
+                document
+                    .querySelectorAll(".course-column")
+                    .forEach(function (column) {
+
+                        const card =
+                            column.querySelector(".course-card");
+
+                        const courseName =
+                            card?.dataset.courseName || "";
+
+                        column.style.display =
+                            courseName.includes(keyword)
+                                ? ""
+                                : "none";
+                    });
+            }
+        );
+    }
+
+</script>

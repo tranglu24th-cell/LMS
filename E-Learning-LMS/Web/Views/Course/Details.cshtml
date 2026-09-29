@@ -1,0 +1,2030 @@
+﻿@model Web.Models.EF.Course
+
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@Model.Title - E-Learning</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            height: 58px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 0;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 32px;
+            white-space: nowrap;
+        }
+
+        .top-link {
+            text-decoration: none;
+            color: #334155;
+            padding: 20px 17px;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+            .top-link:hover {
+                color: #2563eb;
+                background: #f8fafc;
+            }
+
+            .top-link.active {
+                color: #2563eb;
+                font-weight: 600;
+            }
+
+        .user-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 22px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+            .login-icon:hover {
+                background: #f1f5f9;
+                color: #2563eb;
+            }
+
+        /* ================= LAYOUT ================= */
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 340px;
+            min-width: 340px;
+            background: white;
+            border-right: 1px solid #dbe1ea;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            padding: 18px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 1px solid #e5e7eb;
+            color: #1e293b;
+        }
+
+        .chapter {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .chapter-header {
+            width: 100%;
+            border: none;
+            background: white;
+            padding: 15px 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+            .chapter-header:hover {
+                background: #f8fafc;
+            }
+
+        .chapter-arrow,
+        .type-arrow {
+            width: 18px;
+            min-width: 18px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .chapter-content {
+            display: none;
+            background: #fafbfc;
+        }
+
+            .chapter-content.show {
+                display: block;
+            }
+
+        /* ================= LESSON TYPE ================= */
+
+        .lesson-type {
+            border-top: 1px solid #eef2f7;
+        }
+
+        .lesson-type-header {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 11px 18px 11px 38px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+            .lesson-type-header:hover {
+                background: #f1f5f9;
+            }
+
+        .lesson-type-content {
+            display: none;
+        }
+
+            .lesson-type-content.show {
+                display: block;
+            }
+
+        /* ================= LESSON ITEM ================= */
+
+        .lesson-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 10px 15px 10px 65px;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+        }
+
+            .lesson-item:hover {
+                background: #eaf2ff;
+                color: #2563eb;
+            }
+
+            .lesson-item.active {
+                background: #dbeafe;
+                color: #2563eb;
+                font-weight: 600;
+                border-left: 3px solid #2563eb;
+            }
+
+        .lesson-number {
+            min-width: 22px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            flex: 1;
+            padding: 35px;
+            max-width: 1400px;
+            margin: auto;
+            width: 100%;
+        }
+
+        /* ================= COURSE BANNER ================= */
+
+        .course-banner {
+            min-height: 280px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.85)), url('@(string.IsNullOrEmpty(Model.Image) ? "https://images.unsplash.com/photo-1516321318423-f06f85e504b3" : Model.Image)');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 35px;
+            color: white;
+        }
+
+        .course-info {
+            max-width: 900px;
+        }
+
+        .course-label {
+            display: inline-block;
+            background: white;
+            color: #475569;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .course-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .teacher {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .teacher-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* ================= TABS ================= */
+
+        .tabs {
+            background: white;
+            border-bottom: 1px solid #dbe1ea;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 18px 20px;
+            text-decoration: none;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+            .tab.active {
+                color: #2563eb;
+                border-bottom: 3px solid #2563eb;
+                font-weight: bold;
+            }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            margin-top: 30px;
+        }
+
+        .description {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+
+            .description h3 {
+                color: #2563eb;
+                font-size: 21px;
+                margin-bottom: 15px;
+            }
+
+        /* ================= COURSE SECTIONS ================= */
+
+        .course-section {
+            background: white;
+            border: 1px solid #dbe1ea;
+            margin-bottom: 18px;
+        }
+
+        .course-section-title {
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #1e293b;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .course-activity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+            text-align: left;
+            color: #2563eb;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+            .course-activity:last-child {
+                border-bottom: none;
+            }
+
+            .course-activity:hover {
+                background: #f8fafc;
+            }
+
+        .activity-icon {
+            width: 18px;
+            color: #38a3c7;
+        }
+
+        .main-chapter {
+            margin-top: 25px;
+            background: white;
+            border: 1px solid #dbe1ea;
+        }
+
+        .main-chapter-title {
+            padding: 17px 20px;
+            background: #eef4ff;
+            color: #1e40af;
+            font-size: 17px;
+            font-weight: bold;
+            border-bottom: 1px solid #dbe1ea;
+        }
+
+        .main-lesson-type {
+            padding: 14px 20px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #475569;
+            background: #fafbfc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .main-lesson-list {
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-lesson-item {
+            padding: 13px 25px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        /* ================= LESSON VIEW ================= */
+
+        .lesson-view {
+            background: white;
+            border: 1px solid #dbe1ea;
+            border-radius: 10px;
+            overflow: hidden;
+            min-height: 350px;
+        }
+
+        .lesson-view-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+
+        .lesson-view-order {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .lesson-view-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .lesson-view-body {
+            padding: 30px 25px;
+            line-height: 1.7;
+            color: #334155;
+        }
+
+        .lesson-placeholder {
+            padding: 60px 25px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .lesson-placeholder-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            color: #64748b;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @@media (max-width: 900px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                max-height: 450px;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .course-title {
+                font-size: 25px;
+            }
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .top-link {
+                display: none;
+            }
+
+            .logo {
+                margin-right: 0;
+            }
+        }
+        /* ================= PARTICIPANTS ================= */
+
+        .moodle-box {
+            background: #fff;
+            border: 1px solid #d8dee6;
+            padding: 24px;
+        }
+
+        .moodle-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .moodle-description {
+            color: #555;
+            margin-bottom: 22px;
+        }
+
+        .participant-filter {
+            background: #f8f9fa;
+            border: 1px solid #d8dee6;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .filter-row select {
+                min-width: 180px;
+                height: 42px;
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
+                padding: 0 12px;
+                background: white;
+            }
+
+        .participant-count {
+            font-size: 17px;
+            margin: 18px 0;
+        }
+
+        .participant-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .participant-table th,
+            .participant-table td {
+                border: 1px solid #d8dee6;
+                padding: 13px;
+            }
+
+            .participant-table th {
+                background: #eef0f2;
+                font-weight: 600;
+            }
+
+            .participant-table tbody tr:hover {
+                background: #f8fafc;
+            }
+
+        .avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #607d8b;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= TOPBAR ================= -->
+
+    <div class="topbar">
+
+        <a href="/" class="logo">
+            E-Learning
+        </a>
+
+        <a href="/" class="top-link active">
+            Trang chủ
+        </a>
+
+        <a href="/Course" class="top-link">
+            Chuyên mục
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="MyCourses"
+           class="top-link">
+            Khóa học của tôi
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="Results"
+           class="top-link">
+            Kết quả học tập
+        </a>
+
+        <a asp-controller="Learning"
+           asp-action="LookupScore"
+           class="top-link">
+            Tra cứu điểm
+        </a>
+
+        <div class="user-area">
+
+            <a href="/Account/Login"
+               class="login-icon"
+               title="Đăng nhập">
+                <i class="bi bi-person-circle"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= LAYOUT ================= -->
+
+    <div class="layout">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-title">
+                Nội dung khóa học
+            </div>
+
+            @if (Model.Lessons != null && Model.Lessons.Any())
+            {
+                var chapters = Model.Lessons
+                .OrderBy(x => x.ChapterOrder)
+                .ThenBy(x => x.OrderNumber)
+                .GroupBy(x => new
+                {
+                    x.ChapterOrder,
+                    x.ChapterName
+                })
+                .ToList();
+
+                for (int chapterIndex = 0; chapterIndex < chapters.Count; chapterIndex++)
+                {
+                    var chapter = chapters[chapterIndex];
+
+                    var chapterId = $"chapter-{chapterIndex}";
+
+                    <div class="chapter">
+
+                        <!-- CHƯƠNG -->
+                        <button type="button"
+                                class="chapter-header"
+                                data-target="@chapterId">
+
+                            <span class="chapter-arrow">▶</span>
+
+                            <span>
+                                @(string.IsNullOrWhiteSpace(chapter.Key.ChapterName)
+                                    ? $"Chương {chapter.Key.ChapterOrder}"
+                                    : chapter.Key.ChapterName)
+                            </span>
+
+                        </button>
+
+
+                        <!-- CÁC LOẠI BÀI -->
+                        <div id="@chapterId"
+                             class="chapter-content">
+
+                            @{
+                                var lessonTypes = chapter
+                                .GroupBy(x => string.IsNullOrWhiteSpace(x.LessonType)
+                                ? "Khác"
+                                : x.LessonType)
+                                .OrderBy(x =>
+                                x.Key.Contains("Lý thuyết") ? 0 :
+                                x.Key.Contains("Thực hành") ? 1 : 2)
+                                .ToList();
+                            }
+
+                            @for (int typeIndex = 0; typeIndex < lessonTypes.Count; typeIndex++)
+                            {
+                                var lessonType = lessonTypes[typeIndex];
+
+                                var typeId =
+                                $"type-{chapterIndex}-{typeIndex}";
+
+                                var displayType =
+                                lessonType.Key.Contains("Lý thuyết")
+                                ? "Lý thuyết"
+                                : lessonType.Key.Contains("Thực hành")
+                                ? "Thực hành"
+                                : lessonType.Key;
+
+                                <div class="lesson-type">
+
+                                    <!-- LOẠI BÀI -->
+                                    <button type="button"
+                                            class="lesson-type-header"
+                                            data-target="@typeId">
+
+                                        <span class="type-arrow">▶</span>
+
+                                        <span>
+                                            @displayType
+                                        </span>
+
+                                    </button>
+
+
+                                    <!-- DANH SÁCH BÀI -->
+                                    <div id="@typeId"
+                                         class="lesson-type-content">
+
+                                        @foreach (var lesson in lessonType
+                                       .OrderBy(x => x.OrderNumber))
+                                        {
+                                            <button type="button"
+                                                    class="lesson-item"
+                                                    data-lesson-id="@lesson.Id">
+
+                                                <span class="lesson-number">
+                                                    @lesson.OrderNumber.
+                                                </span>
+
+                                                <span>
+                                                    @lesson.Title
+                                                </span>
+
+                                            </button>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="lesson-placeholder">
+                    Chưa có bài học
+                </div>
+            }
+
+        </aside>
+
+
+        <!-- ================= MAIN ================= -->
+
+        <main class="main">
+
+            <!-- ================= COURSE BANNER ================= -->
+
+            <div class="course-banner">
+
+                <div class="course-info">
+
+                    <span class="course-label">
+                        Khóa học
+                    </span>
+
+                    <div class="course-title">
+                        @Model.Title
+                    </div>
+
+                    <div class="teacher">
+
+                        <div class="teacher-avatar">
+                            @(Model.Teacher?.Username?.Substring(0, 1).ToUpper() ?? "T")
+                        </div>
+
+                        <span>
+                            @(Model.Teacher?.Username ?? "Chưa cập nhật giảng viên")
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= TABS ================= -->
+
+
+
+            <div class="tabs">
+
+                <a href="#course-content" class="tab active">
+                    Course
+                </a>
+
+                <a href="#participants-content" class="tab">
+                    Participants
+                </a>
+
+                <a href="#grades-content" class="tab">
+                    Grades
+                </a>
+
+                <a href="#activities-content" class="tab">
+                    Activities
+                </a>
+
+                <a href="#competencies-content" class="tab">
+                    Competencies
+                </a>
+
+                <a href="#more-content" class="tab">
+                    ...
+                </a>
+
+            </div>
+
+            <!-- ================= CONTENT ================= -->
+
+            <div class="content">
+
+                <div id="course-content" class="tab-content-box">
+
+                    <!-- MÔ TẢ -->
+
+                <div class="description">
+
+                    <h3>
+                        📢 Giới thiệu khóa học
+                    </h3>
+
+                    <p>
+                        @(Model.Description ?? "Chưa có mô tả cho khóa học này.")
+                    </p>
+
+                </div>
+                
+                <!-- ================= NỘI DUNG THEO MẪU LMS ================= -->
+
+                <div class="course-section">
+
+                    <div class="course-section-title">
+                        Thông tin chung học phần
+                    </div>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        1. Đề cương chi tiết học phần
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        2. Hướng dẫn dành cho sinh viên
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        3. Kế hoạch giảng dạy
+                    </button>
+
+                </div>
+
+
+                <div class="course-section">
+
+                    <div class="course-section-title">
+                        CLO, CĐR, Bloom
+                    </div>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        1. Chuẩn đầu ra CLO
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        2. Ma trận CLO - Phương pháp đánh giá
+                    </button>
+
+                </div>
+
+
+                <div class="course-section">
+
+                    <div class="course-section-title">
+                        Kiểm tra, đánh giá
+                    </div>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        1. Thang điểm và tỷ lệ các thành phần
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        2. Cấu trúc đề thi
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        3. Đề cương ôn tập giữa kỳ
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        4. Đề cương ôn tập cuối kỳ
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        5. Dữ liệu đáp án của bài
+                    </button>
+
+                </div>
+
+
+                <div class="course-section">
+
+                    <div class="course-section-title">
+                        Chính sách học phần
+                    </div>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        1. Quy định học tập
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        2. Chính sách vắng học, học bù
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        3. Hướng dẫn hoàn thành bài tập
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        4. Quy định về nộp và sử dụng AI
+                    </button>
+
+                    <button type="button" class="course-activity">
+                        <span class="activity-icon">▧</span>
+                        5. Điều kiện hoàn thành học phần
+                    </button>
+
+                </div>
+               
+
+                <!-- ================= TUẦN / CHƯƠNG ================= -->
+                @if (Model.Lessons != null && Model.Lessons.Any())
+                {
+                    var mainChapters = Model.Lessons
+                    .OrderBy(x => x.ChapterOrder)
+                    .ThenBy(x => x.OrderNumber)
+                    .GroupBy(x => new
+                    {
+                        x.ChapterOrder,
+                        x.ChapterName
+                    })
+                    .ToList();
+
+                    foreach (var chapter in mainChapters)
+                    {
+                        var mainTypes = chapter
+                        .GroupBy(x => string.IsNullOrWhiteSpace(x.LessonType)
+                        ? "Khác"
+                        : x.LessonType)
+                        .OrderBy(x =>
+                        x.Key.Contains("Lý thuyết") ? 0 :
+                        x.Key.Contains("Thực hành") ? 1 : 2)
+                        .ToList();
+
+                        <div class="main-chapter">
+
+                            <div class="main-chapter-title">
+
+                                Tuần @chapter.Key.ChapterOrder -
+                                @(string.IsNullOrWhiteSpace(chapter.Key.ChapterName)
+                                    ? $"Chương {chapter.Key.ChapterOrder}"
+                                    : chapter.Key.ChapterName)
+
+                            </div>
+
+                            @foreach (var type in mainTypes)
+                            {
+                                var displayType =
+                                type.Key.Contains("Lý thuyết")
+                                ? "Lecture / Lý thuyết"
+                                : type.Key.Contains("Thực hành")
+                                ? "Thực hành"
+                                : type.Key;
+
+                                <div class="main-lesson-type">
+                                    @displayType
+                                </div>
+
+                                <div class="main-lesson-list">
+
+                                    @foreach (var lesson in type.OrderBy(x => x.OrderNumber))
+                                    {
+                                        <button type="button"
+                                                class="course-activity main-lesson-item lesson-item"
+                                                data-lesson-id="@lesson.Id">
+
+                                            <span class="activity-icon">
+                                                ▧
+                                            </span>
+
+                                            <span>
+                                                @lesson.OrderNumber.
+                                                @lesson.Title
+                                            </span>
+
+                                        </button>
+                                    }
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                }
+
+                <!-- NỘI DUNG BÀI HỌC -->
+                @if (Model.Lessons != null && Model.Lessons.Any())
+                {
+                    <div class="lesson-view">
+
+                        <div class="lesson-view-header">
+
+                            <div class="lesson-view-order"
+                                 id="lesson-view-order">
+                            </div>
+
+                            <div class="lesson-view-title"
+                                 id="lesson-view-title">
+
+                                Chọn bài học ở bên trái
+
+                            </div>
+
+                        </div>
+
+                        <div class="lesson-view-body"
+                             id="lesson-view-body">
+
+                            <div class="lesson-placeholder">
+
+                                <div class="lesson-placeholder-icon">
+                                    📚
+                                </div>
+
+                                <div>
+                                    Hãy chọn một bài học ở danh sách bên trái
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DỮ LIỆU ẨN CỦA TỪNG BÀI -->
+                    @foreach (var lesson in Model.Lessons)
+                    {
+                        <div id="lesson-data-@lesson.Id"
+                             data-title="@lesson.Title"
+                             data-order="@lesson.OrderNumber"
+                             style="display:none;">
+
+                            @Html.Raw(
+                                     string.IsNullOrWhiteSpace(lesson.Content)
+                                     ? "<p>Chưa có nội dung cho bài học này.</p>"
+                                     : lesson.Content
+                                     )
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty">
+
+                        <h4>
+                            Chưa có bài học
+                        </h4>
+
+                        <p>
+                            Giảng viên chưa thêm bài học cho khóa học này.
+                        </p>
+
+                    </div>
+                }
+
+            </div>
+                <!-- ================= PARTICIPANTS ================= -->
+
+                <div id="participants-content"
+                     class="tab-content-box"
+                     style="display:none;">
+
+                    <div class="moodle-box">
+
+                        <h2 class="moodle-title">
+                            Thành viên khóa học
+                        </h2>
+
+                        <p class="moodle-description">
+                            Danh sách sinh viên đang tham gia khóa học.
+                        </p>
+
+                        <!-- BỘ LỌC -->
+
+                        <div class="participant-filter">
+
+                            <div class="filter-row">
+
+                                <span>Hiển thị theo</span>
+
+                                <select id="participantFilter">
+                                    <option value="all">
+                                        Tất cả
+                                    </option>
+
+                                    <option value="active">
+                                        Đang hoạt động
+                                    </option>
+
+                                    <option value="locked">
+                                        Đã khóa
+                                    </option>
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- SỐ LƯỢNG -->
+
+                        <div class="participant-count">
+
+                            Có
+                            <strong>
+                                @(Model.Enrollments?.Count ?? 0)
+                            </strong>
+                            sinh viên tham gia
+
+                        </div>
+
+
+                        <!-- BẢNG SINH VIÊN -->
+                        @if (Model.Enrollments != null &&
+                        Model.Enrollments.Any())
+                        {
+                            <table class="participant-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th style="width:60px;">
+                                            STT
+                                        </th>
+
+                                        <th>
+                                            Sinh viên
+                                        </th>
+
+                                        <th>
+                                            MSSV
+                                        </th>
+
+                                        <th>
+                                            Lớp
+                                        </th>
+
+                                        <th>
+                                            Trạng thái
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @{
+                                        int stt = 1;
+                                    }
+
+                                    @foreach (var enrollment in Model.Enrollments)
+                                    {
+                                        var student = enrollment.Student;
+
+                                        if (student == null)
+                                        {
+                                            continue;
+                                        }
+
+                                        <tr class="participant-row"
+                                            data-status="@(student.IsActive ? "active" : "locked")">
+
+                                            <td>
+                                                @stt
+                                            </td>
+
+                                            <td>
+                                                <div style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                    ">
+                                                    <span class="avatar-small">
+                                                        @(string.IsNullOrEmpty(student.FullName)
+                                                            ? "?"
+                                                            : student.FullName.Substring(0, 1).ToUpper())
+                                                    </span>
+
+                                                    <strong>
+                                                        @student.FullName
+                                                    </strong>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                @student.MSSV
+                                            </td>
+
+                                            <td>
+                                                @(student.ClassName ?? "Chưa cập nhật")
+                                            </td>
+
+                                            <td>
+                                                @if (student.IsActive)
+                                                {
+                                                    <span style="
+                    color:#198754;
+                    font-weight:600;
+                            ">
+                                                        ● Đang hoạt động
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="
+                    color:#dc3545;
+                    font-weight:600;
+                            ">
+                                                        ● Đã khóa
+                                                    </span>
+                                                }
+                                            </td>
+
+                                        </tr>
+
+                                        stt++;
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="no-competency">
+                                Chưa có sinh viên tham gia khóa học.
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+                <!-- ================= GRADES ================= -->
+
+                <div id="grades-content"
+                     class="tab-content-box"
+                     style="display:none;">
+
+                    <div class="moodle-box">
+
+                        <h2 class="moodle-title">
+                            📊 Kết quả học tập
+                        </h2>
+
+                        <p class="moodle-description">
+                            Kết quả và điểm của sinh viên trong khóa học.
+                        </p>
+
+                        @if (Model.Grades != null && Model.Grades.Any())
+                        {
+                            <div class="participant-count">
+
+                                Có
+                                <strong>
+                                    @Model.Grades.Count
+                                </strong>
+                                kết quả được ghi nhận
+
+                            </div>
+
+                            <table class="participant-table">
+
+                                <thead>
+                                    <tr>
+
+                                        <th style="width:60px;">
+                                            STT
+                                        </th>
+
+                                        <th>
+                                            Sinh viên
+                                        </th>
+
+                                        <th>
+                                            MSSV
+                                        </th>
+
+                                        <th>
+                                            Điểm
+                                        </th>
+
+                                        <th>
+                                            Nhận xét
+                                        </th>
+
+                                        <th>
+                                            Ngày chấm
+                                        </th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @{
+                                        int gradeStt = 1;
+                                    }
+
+                                    @foreach (var grade in Model.Grades
+                                   .OrderBy(g => g.Student?.FullName))
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @gradeStt
+                                            </td>
+
+                                            <td>
+                                                <div style="
+                                    display:flex;
+                                    align-items:center;
+                                    gap:10px;
+                                        ">
+
+                                                    <span class="avatar-small">
+
+                                                        @(string.IsNullOrEmpty(grade.Student?.FullName)
+                                                            ? "?"
+                                                            : grade.Student.FullName.Substring(0, 1).ToUpper())
+
+                                                    </span>
+
+                                                    <strong>
+                                                        @(grade.Student?.FullName ?? "Chưa cập nhật")
+                                                    </strong>
+
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                @(grade.Student?.MSSV ?? "Chưa cập nhật")
+                                            </td>
+
+                                            <td>
+                                                <strong style="
+                                    color:#2563eb;
+                                    font-size:16px;
+                                        ">
+                                                    @grade.Score.ToString("0.##")
+                                                </strong>
+                                            </td>
+
+                                            <td>
+                                                @(string.IsNullOrWhiteSpace(grade.Comment)
+                                                    ? "Chưa có nhận xét"
+                                                    : grade.Comment)
+                                            </td>
+
+                                            <td>
+                                                @grade.GradedAt.ToString("dd/MM/yyyy")
+                                            </td>
+
+                                        </tr>
+
+                                        gradeStt++;
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="empty">
+
+                                <h4>
+                                    Chưa có kết quả học tập
+                                </h4>
+
+                                <p>
+                                    Hiện tại chưa có điểm nào được ghi nhận cho khóa học này.
+                                </p>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= ACTIVITIES ================= -->
+
+                <div id="activities-content"
+                     class="tab-content-box"
+                     style="display:none;">
+
+                    <div class="moodle-box">
+
+                        <h2 class="moodle-title">
+                            📝 Hoạt động học tập
+                        </h2>
+
+                        <p class="moodle-description">
+                            Danh sách các bài học và hoạt động học tập trong khóa học.
+                        </p>
+
+                        @if (Model.Lessons != null && Model.Lessons.Any())
+                        {
+                            <div class="participant-count">
+
+                                Có
+                                <strong>
+                                    @Model.Lessons.Count
+                                </strong>
+                                bài học trong khóa học
+
+                            </div>
+
+                            <table class="participant-table">
+
+                                <thead>
+                                    <tr>
+
+                                        <th style="width:60px;">
+                                            STT
+                                        </th>
+
+                                        <th>
+                                            Bài học
+                                        </th>
+
+                                        <th>
+                                            Chương
+                                        </th>
+
+                                        <th>
+                                            Loại bài
+                                        </th>
+
+                                        <th>
+                                            Thứ tự
+                                        </th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @{
+                                        int activityStt = 1;
+                                    }
+
+                                    @foreach (var lesson in Model.Lessons
+                                   .OrderBy(x => x.ChapterOrder)
+                                   .ThenBy(x => x.OrderNumber))
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @activityStt
+                                            </td>
+
+                                            <td>
+                                                <strong>
+                                                    @lesson.Title
+                                                </strong>
+                                            </td>
+
+                                            <td>
+                                                @(string.IsNullOrWhiteSpace(lesson.ChapterName)
+                                                    ? $"Chương {lesson.ChapterOrder}"
+                                                    : lesson.ChapterName)
+                                            </td>
+
+                                            <td>
+                                                @(string.IsNullOrWhiteSpace(lesson.LessonType)
+                                                    ? "Khác"
+                                                    : lesson.LessonType)
+                                            </td>
+
+                                            <td>
+                                                Bài @lesson.OrderNumber
+                                            </td>
+
+                                        </tr>
+
+                                        activityStt++;
+                                    }
+
+                                </tbody>
+
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="empty">
+
+                                <h4>
+                                    Chưa có hoạt động
+                                </h4>
+
+                                <p>
+                                    Khóa học hiện chưa có bài học hoặc hoạt động học tập.
+                                </p>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+                <!-- ================= COMPETENCIES ================= -->
+
+                <div id="competencies-content"
+                     class="tab-content-box"
+                     style="display:none;">
+
+                    <div class="moodle-box">
+
+                        <h2 class="moodle-title">
+                            🎯 Chuẩn đầu ra và năng lực
+                        </h2>
+
+                        <p class="moodle-description">
+                            Các năng lực và kiến thức sinh viên cần đạt được sau khi hoàn thành khóa học.
+                        </p>
+
+
+                        <!-- KIẾN THỨC -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                1. Kiến thức
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Nắm được các kiến thức cơ bản của học phần.
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Hiểu và giải thích được các khái niệm liên quan đến nội dung môn học.
+                            </div>
+
+                        </div>
+
+
+                        <!-- KỸ NĂNG -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                2. Kỹ năng
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Vận dụng kiến thức đã học để giải quyết các bài tập và tình huống thực tế.
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Thực hiện các bài thực hành theo yêu cầu của học phần.
+                            </div>
+
+                        </div>
+
+
+                        <!-- TỰ HỌC -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                3. Năng lực tự học
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Chủ động tìm hiểu và bổ sung kiến thức trong quá trình học tập.
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Sử dụng tài liệu và trợ lý AI để hỗ trợ việc học và ôn tập.
+                            </div>
+
+                        </div>
+
+
+                        <!-- THÁI ĐỘ -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                4. Thái độ học tập
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Có ý thức tham gia đầy đủ các hoạt động học tập.
+                            </div>
+
+                            <div class="course-activity">
+                                <span class="activity-icon">✓</span>
+                                Tuân thủ các quy định và yêu cầu của khóa học.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ================= MORE ================= -->
+
+                <div id="more-content"
+                     class="tab-content-box"
+                     style="display:none;">
+
+                    <div class="moodle-box">
+
+                        <h2 class="moodle-title">
+                            ℹ️ Thông tin khóa học
+                        </h2>
+
+                        <p class="moodle-description">
+                            Thông tin tổng quan của khóa học.
+                        </p>
+
+
+                        <!-- GIẢNG VIÊN -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                👨‍🏫 Giảng viên
+                            </div>
+
+                            <div style="padding:20px;">
+
+                                <strong>
+                                    @(Model.Teacher?.FullName
+                                        ?? Model.Teacher?.Username
+                                        ?? "Chưa cập nhật")
+                                </strong>
+
+                                @if (!string.IsNullOrWhiteSpace(Model.Teacher?.Email))
+                                {
+                                    <div style="
+                        margin-top:8px;
+                        color:#64748b;">
+
+                                        📧 @Model.Teacher.Email
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- MÔ TẢ -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                📖 Mô tả khóa học
+                            </div>
+
+                            <div style="
+                padding:20px;
+                line-height:1.7;
+                color:#475569;">
+
+                                @(string.IsNullOrWhiteSpace(Model.Description)
+                                    ? "Chưa có mô tả cho khóa học này."
+                                    : Model.Description)
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- THỐNG KÊ -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                📊 Thống kê khóa học
+                            </div>
+
+                            <div style="
+                display:grid;
+                grid-template-columns:repeat(3, 1fr);
+                gap:15px;
+                padding:20px;">
+
+                                <div style="
+                    border:1px solid #dbe1ea;
+                    padding:20px;
+                    text-align:center;
+                    border-radius:8px;">
+
+                                    <div style="
+                        font-size:26px;
+                        font-weight:bold;
+                        color:#2563eb;">
+
+                                        @(Model.Lessons?.Count ?? 0)
+
+                                    </div>
+
+                                    <div style="
+                        margin-top:5px;
+                        color:#64748b;">
+
+                                        Bài học
+
+                                    </div>
+
+                                </div>
+
+
+                                <div style="
+                    border:1px solid #dbe1ea;
+                    padding:20px;
+                    text-align:center;
+                    border-radius:8px;">
+
+                                    <div style="
+                        font-size:26px;
+                        font-weight:bold;
+                        color:#2563eb;">
+
+                                        @(Model.Enrollments?.Count ?? 0)
+
+                                    </div>
+
+                                    <div style="
+                        margin-top:5px;
+                        color:#64748b;">
+
+                                        Sinh viên
+
+                                    </div>
+
+                                </div>
+
+
+                                <div style="
+                    border:1px solid #dbe1ea;
+                    padding:20px;
+                    text-align:center;
+                    border-radius:8px;">
+
+                                    <div style="
+                        font-size:26px;
+                        font-weight:bold;
+                        color:#2563eb;">
+
+                                        @(Model.Grades?.Count ?? 0)
+
+                                    </div>
+
+                                    <div style="
+                        margin-top:5px;
+                        color:#64748b;">
+
+                                        Kết quả
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NGÀY TẠO -->
+
+                        <div class="course-section">
+
+                            <div class="course-section-title">
+                                📅 Thời gian
+                            </div>
+
+                            <div style="
+                padding:20px;
+                color:#475569;">
+
+                                Khóa học được tạo ngày:
+
+                                <strong>
+                                    @Model.CreatedAt.ToString("dd/MM/yyyy")
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- HẾT CONTENT -->
+
+        </main>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        // ================= CHƯƠNG =================
+
+        document.querySelectorAll(".chapter-header").forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                const targetId = this.dataset.target;
+                const target = document.getElementById(targetId);
+
+                const arrow = this.querySelector(".chapter-arrow");
+
+                const isOpen = target.classList.contains("show");
+
+                target.classList.toggle("show", !isOpen);
+
+                arrow.textContent = isOpen ? "▶" : "▼";
+
+            });
+
+        });
+
+
+        // ================= LOẠI BÀI =================
+
+        document.querySelectorAll(".lesson-type-header").forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                const targetId = this.dataset.target;
+                const target = document.getElementById(targetId);
+
+                const arrow = this.querySelector(".type-arrow");
+
+                const isOpen = target.classList.contains("show");
+
+                target.classList.toggle("show", !isOpen);
+
+                arrow.textContent = isOpen ? "▶" : "▼";
+
+            });
+
+        });
+
+
+        // ================= CHỌN BÀI HỌC =================
+
+        document.querySelectorAll(".lesson-item").forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                const lessonId = this.dataset.lessonId;
+
+                // Bỏ active cũ
+                document.querySelectorAll(".lesson-item")
+                    .forEach(item => item.classList.remove("active"));
+
+                // Active bài đang chọn
+                this.classList.add("active");
+
+                // Lấy dữ liệu bài học
+                const lessonData =
+                    document.getElementById("lesson-data-" + lessonId);
+
+                if (!lessonData) {
+                    return;
+                }
+
+                const title =
+                    lessonData.dataset.title;
+
+                const order =
+                    lessonData.dataset.order;
+
+                const content =
+                    lessonData.innerHTML;
+
+
+                // Hiển thị bên phải
+                document.getElementById("lesson-view-order")
+                    .textContent = "Bài " + order;
+
+                document.getElementById("lesson-view-title")
+                    .textContent = title;
+
+                document.getElementById("lesson-view-body")
+                    .innerHTML = content;
+
+                // Cuộn lên đầu phần nội dung
+                document.querySelector(".lesson-view")
+                    .scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+            });
+
+        });
+               // XỬ LÝ CÁC TAB COURSE
+        document.querySelectorAll(".tab").forEach(tab => {
+            tab.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                // Bỏ active ở tất cả tab
+                document.querySelectorAll(".tab").forEach(x => {
+                    x.classList.remove("active");
+                });
+
+                // Active tab đang chọn
+                this.classList.add("active");
+
+                // Ẩn tất cả nội dung tab
+                document.querySelectorAll(".tab-content-box").forEach(x => {
+                    x.style.display = "none";
+                });
+
+                // Lấy nội dung tương ứng
+                const targetId = this.getAttribute("href");
+                const target = document.querySelector(targetId);
+
+                if (target) {
+                    target.style.display = "block";
+                }
+            });
+        });
+                // ================= LỌC SINH VIÊN =================
+
+        const participantFilter = document.getElementById("participantFilter");
+
+        if (participantFilter) {
+
+            participantFilter.addEventListener("change", function () {
+
+                const selectedStatus = this.value;
+
+                document.querySelectorAll(".participant-row").forEach(row => {
+
+                    const status = row.dataset.status;
+
+                    if (selectedStatus === "all") {
+                        row.style.display = "";
+                    }
+                    else if (status === selectedStatus) {
+                        row.style.display = "";
+                    }
+                    else {
+                        row.style.display = "none";
+                    }
+
+                });
+
+            });
+
+        }
+    </script>
+
+
+
+    <!-- ============ AI TUTOR CHATBOT WIDGET ============ -->
+    @{
+        var tutorCtx = new ChatWidgetModel { CourseId = Model.Id, ContextLabel = "Đang hỗ trợ khóa: " + Model.Title };
+    }
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+</body>
+</html>

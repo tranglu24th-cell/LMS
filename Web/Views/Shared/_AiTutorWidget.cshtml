@@ -1,0 +1,536 @@
+@model Web.Models.ChatWidgetModel
+
+@*
+    Khung chat "Trợ giảng AI" dùng chung cho các trang LMS.
+
+    Cách gắn vào một trang (đặt ngay trước </body>):
+        @await Html.PartialAsync("_AiTutorWidget", new ChatWidgetModel())
+        @await Html.PartialAsync("_AiTutorWidget", new ChatWidgetModel { CourseId = Model.Id })
+        @await Html.PartialAsync("_AiTutorWidget", new ChatWidgetModel { LessonId = Model.Id, CourseId = Model.CourseId })
+
+    Lịch sử hội thoại KHÔNG giữ trong JS: mở khung chat là gọi /Chat/History
+    để nạp lại từ bảng ChatConversations / ChatMessages.
+*@
+
+@{
+    var ctx = Model ?? new Web.Models.ChatWidgetModel();
+    var contextLabel = string.IsNullOrWhiteSpace(ctx.ContextLabel)
+        ? "Giải thích khái niệm & nội dung bài học"
+        : ctx.ContextLabel;
+
+    var courseIdAttr = ctx.CourseId.HasValue ? ctx.CourseId.Value.ToString() : "";
+    var lessonIdAttr = ctx.LessonId.HasValue ? ctx.LessonId.Value.ToString() : "";
+}
+
+<style>
+    :root {
+        --tutor-primary: #2563eb;
+        --tutor-primary-dark: #1d4ed8;
+        --tutor-bg: #f5f7fb;
+        --tutor-border: #e5e7eb;
+        --tutor-text: #1e293b;
+        --tutor-muted: #64748b;
+    }
+
+    #tutorToggle {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        height: 54px;
+        padding: 0 20px 0 16px;
+        border: none;
+        border-radius: 27px;
+        background: linear-gradient(135deg, var(--tutor-primary), var(--tutor-primary-dark));
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, .35);
+        cursor: pointer;
+        z-index: 1200;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        #tutorToggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(37, 99, 235, .45);
+        }
+
+        #tutorToggle .tutor-ico {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+    #tutorPanel {
+        position: fixed;
+        bottom: 90px;
+        right: 24px;
+        width: 380px;
+        max-width: calc(100vw - 32px);
+        height: 540px;
+        max-height: calc(100vh - 130px);
+        background: #fff;
+        border: 1px solid var(--tutor-border);
+        border-radius: 16px;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, .22);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1200;
+        font-family: Arial, sans-serif;
+        color: var(--tutor-text);
+    }
+
+        #tutorPanel.show {
+            display: flex;
+        }
+
+    #tutorHeader {
+        background: linear-gradient(135deg, var(--tutor-primary), var(--tutor-primary-dark));
+        color: #fff;
+        padding: 13px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+        #tutorHeader .tutor-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        #tutorHeader .tutor-sub {
+            font-size: 11px;
+            opacity: .85;
+            margin-top: 2px;
+        }
+
+    .tutor-head-btn {
+        background: rgba(255,255,255,.15);
+        border: none;
+        color: #fff;
+        border-radius: 7px;
+        cursor: pointer;
+        padding: 5px 8px;
+        font-size: 12px;
+        line-height: 1;
+    }
+
+        .tutor-head-btn:hover {
+            background: rgba(255,255,255,.3);
+        }
+
+    #tutorClose {
+        font-size: 18px;
+        padding: 3px 9px;
+    }
+
+    #tutorBody {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px;
+        background: var(--tutor-bg);
+    }
+
+    .tutor-msg {
+        display: flex;
+        margin-bottom: 11px;
+    }
+
+        .tutor-msg.user {
+            justify-content: flex-end;
+        }
+
+        .tutor-msg.assistant {
+            justify-content: flex-start;
+        }
+
+    .tutor-bubble {
+        max-width: 84%;
+        padding: 10px 13px;
+        border-radius: 13px;
+        font-size: 13.5px;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .tutor-msg.assistant .tutor-bubble {
+        background: #fff;
+        border: 1px solid var(--tutor-border);
+        border-bottom-left-radius: 3px;
+    }
+
+    .tutor-msg.user .tutor-bubble {
+        background: var(--tutor-primary);
+        color: #fff;
+        border-bottom-right-radius: 3px;
+    }
+
+    .tutor-note {
+        font-size: 12px;
+        color: var(--tutor-muted);
+        text-align: center;
+        padding: 8px 12px;
+        line-height: 1.5;
+    }
+
+        .tutor-note a {
+            color: var(--tutor-primary);
+        }
+
+    .tutor-suggests {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0 2px 10px;
+    }
+
+    .tutor-chip {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        border-radius: 14px;
+        padding: 6px 11px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+        .tutor-chip:hover {
+            border-color: var(--tutor-primary);
+            color: var(--tutor-primary);
+        }
+
+    #tutorFooter {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        background: #fff;
+        border-top: 1px solid var(--tutor-border);
+    }
+
+    #tutorInput {
+        flex: 1;
+        resize: none;
+        border: 1px solid #cbd5e1;
+        border-radius: 18px;
+        padding: 9px 14px;
+        font-size: 13.5px;
+        font-family: inherit;
+        line-height: 1.4;
+        max-height: 92px;
+        outline: none;
+    }
+
+        #tutorInput:focus {
+            border-color: var(--tutor-primary);
+        }
+
+    #tutorSend {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        align-self: flex-end;
+        border: none;
+        border-radius: 50%;
+        background: var(--tutor-primary);
+        color: #fff;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+        #tutorSend:hover {
+            background: var(--tutor-primary-dark);
+        }
+
+        #tutorSend:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+    .tutor-typing {
+        font-size: 12px;
+        font-style: italic;
+        color: var(--tutor-muted);
+        padding-left: 4px;
+    }
+
+    @@media (max-width: 480px) {
+        #tutorPanel {
+            right: 12px;
+            left: 12px;
+            width: auto;
+            bottom: 82px;
+        }
+
+        #tutorToggle {
+            right: 14px;
+            bottom: 14px;
+        }
+    }
+</style>
+
+<button id="tutorToggle" type="button" title="Hỏi trợ giảng AI">
+    <span class="tutor-ico">🎓</span>
+    <span>Trợ giảng AI</span>
+</button>
+
+<div id="tutorPanel"
+     data-course-id="@courseIdAttr"
+     data-lesson-id="@lessonIdAttr">
+
+    <div id="tutorHeader">
+        <div>
+            <div class="tutor-title">🎓 Trợ giảng AI</div>
+            <div class="tutor-sub">@contextLabel</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+            <button type="button" class="tutor-head-btn" id="tutorNew" title="Bắt đầu cuộc trò chuyện mới">Mới</button>
+            <button type="button" class="tutor-head-btn" id="tutorClose" title="Đóng">&times;</button>
+        </div>
+    </div>
+
+    <div id="tutorBody">
+        <div class="tutor-note" id="tutorLoading">Đang tải lịch sử trò chuyện...</div>
+    </div>
+
+    <div id="tutorFooter">
+        <textarea id="tutorInput" rows="1"
+                  placeholder="Hỏi về một khái niệm trong bài..."></textarea>
+        <button id="tutorSend" type="button" title="Gửi">➤</button>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var panel = document.getElementById('tutorPanel');
+        if (!panel || panel.dataset.tutorReady === '1') return;
+        panel.dataset.tutorReady = '1';
+
+        var toggleBtn = document.getElementById('tutorToggle');
+        var closeBtn = document.getElementById('tutorClose');
+        var newBtn = document.getElementById('tutorNew');
+        var body = document.getElementById('tutorBody');
+        var input = document.getElementById('tutorInput');
+        var sendBtn = document.getElementById('tutorSend');
+
+        var courseId = panel.dataset.courseId ? parseInt(panel.dataset.courseId, 10) : null;
+        var lessonId = panel.dataset.lessonId ? parseInt(panel.dataset.lessonId, 10) : null;
+
+        // Chỉ giữ ID hội thoại. Toàn bộ nội dung lịch sử nằm ở CSDL,
+        // server tự nạp lại từ ChatMessages mỗi lần gửi tin nhắn.
+        var conversationId = null;
+        var historyLoaded = false;
+        var busy = false;
+
+        var GREETING = 'Chào bạn! Mình là trợ giảng AI của lớp học.\n\n'
+            + 'Bạn đang vướng khái niệm nào trong bài? Mô tả giúp mình chỗ chưa hiểu, '
+            + 'mình sẽ giải thích lại từ đầu bằng ví dụ dễ hình dung nhé.';
+
+        var SUGGESTIONS = [
+            'Giải thích khái niệm chính của bài này',
+            'Cho mình một ví dụ dễ hiểu',
+            'Mình hay nhầm chỗ nào trong phần này?'
+        ];
+
+        // ---------- Hiển thị ----------
+
+        function scrollBottom() {
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function appendMessage(text, role) {
+            var wrap = document.createElement('div');
+            wrap.className = 'tutor-msg ' + (role === 'user' ? 'user' : 'assistant');
+
+            var bubble = document.createElement('div');
+            bubble.className = 'tutor-bubble';
+            bubble.textContent = text;
+
+            wrap.appendChild(bubble);
+            body.appendChild(wrap);
+            scrollBottom();
+            return wrap;
+        }
+
+        function appendNote(text) {
+            var note = document.createElement('div');
+            note.className = 'tutor-note';
+            note.textContent = text;
+            body.appendChild(note);
+            scrollBottom();
+        }
+
+        function appendSuggestions() {
+            var box = document.createElement('div');
+            box.className = 'tutor-suggests';
+
+            SUGGESTIONS.forEach(function (s) {
+                var chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'tutor-chip';
+                chip.textContent = s;
+                chip.addEventListener('click', function () {
+                    box.remove();
+                    input.value = s;
+                    send();
+                });
+                box.appendChild(chip);
+            });
+
+            body.appendChild(box);
+            scrollBottom();
+        }
+
+        function showTyping() {
+            var el = document.createElement('div');
+            el.className = 'tutor-typing';
+            el.id = 'tutorTyping';
+            el.textContent = 'Trợ giảng đang soạn câu trả lời...';
+            body.appendChild(el);
+            scrollBottom();
+        }
+
+        function hideTyping() {
+            var el = document.getElementById('tutorTyping');
+            if (el) el.remove();
+        }
+
+        function setBusy(state) {
+            busy = state;
+            sendBtn.disabled = state;
+        }
+
+        // ---------- Nạp lịch sử TỪ CSDL ----------
+
+        async function loadHistory() {
+            if (historyLoaded) return;
+            historyLoaded = true;
+
+            try {
+                var res = await fetch('/Chat/History', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                var data = await res.json();
+
+                body.innerHTML = '';
+
+                if (!data.signedIn) {
+                    appendMessage(GREETING, 'assistant');
+                    appendNote('Bạn chưa đăng nhập nên hội thoại sẽ không được lưu lại. '
+                             + 'Đăng nhập để trợ giảng nhớ được ngữ cảnh học tập của bạn.');
+                    appendSuggestions();
+                    return;
+                }
+
+                conversationId = data.conversationId || null;
+
+                if (!data.messages || data.messages.length === 0) {
+                    appendMessage(GREETING, 'assistant');
+                    appendSuggestions();
+                    return;
+                }
+
+                data.messages.forEach(function (m) {
+                    appendMessage(m.content, m.role === 'user' ? 'user' : 'assistant');
+                });
+
+                scrollBottom();
+            } catch (err) {
+                body.innerHTML = '';
+                appendMessage(GREETING, 'assistant');
+                appendNote('Không tải được lịch sử trò chuyện, nhưng bạn vẫn có thể đặt câu hỏi.');
+            }
+        }
+
+        // ---------- Gửi tin nhắn ----------
+
+        async function send() {
+            if (busy) return;
+
+            var text = (input.value || '').trim();
+            if (!text) return;
+
+            appendMessage(text, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            setBusy(true);
+            showTyping();
+
+            try {
+                var res = await fetch('/Chat/SendMessage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        conversationId: conversationId,
+                        courseId: courseId,
+                        lessonId: lessonId
+                    })
+                });
+
+                var data = await res.json();
+                hideTyping();
+
+                if (data.conversationId) {
+                    conversationId = data.conversationId;
+                }
+
+                appendMessage(
+                    data.reply || 'Xin lỗi, hiện mình chưa trả lời được câu hỏi này.',
+                    'assistant');
+            } catch (err) {
+                hideTyping();
+                appendMessage('Không kết nối được tới máy chủ. Bạn kiểm tra mạng và thử lại nhé.', 'assistant');
+            } finally {
+                setBusy(false);
+                input.focus();
+            }
+        }
+
+        // ---------- Sự kiện ----------
+
+        toggleBtn.addEventListener('click', function () {
+            panel.classList.toggle('show');
+            if (panel.classList.contains('show')) {
+                loadHistory();
+                input.focus();
+            }
+        });
+
+        closeBtn.addEventListener('click', function () {
+            panel.classList.remove('show');
+        });
+
+        newBtn.addEventListener('click', async function () {
+            try {
+                await fetch('/Chat/NewConversation', { method: 'POST' });
+            } catch (err) { /* bỏ qua, vẫn reset phía giao diện */ }
+
+            conversationId = null;
+            body.innerHTML = '';
+            appendMessage(GREETING, 'assistant');
+            appendSuggestions();
+            input.focus();
+        });
+
+        sendBtn.addEventListener('click', send);
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+            }
+        });
+
+        // Ô nhập tự giãn theo nội dung
+        input.addEventListener('input', function () {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 92) + 'px';
+        });
+    })();
+</script>

@@ -1,0 +1,612 @@
+﻿@{
+    ViewBag.Title = "Quản lý điểm";
+
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+
+    var students = ViewBag.Students as IEnumerable<dynamic>;
+    var courses = ViewBag.Courses as IEnumerable<dynamic>;
+}
+
+<div class="card">
+
+    <div class="card-header">
+
+        <h1 class="card-title">
+            @ViewBag.Title
+        </h1>
+
+    </div>
+
+    <div class="card-body table-responsive">
+
+        <div class="row mb-3">
+
+            <div class="col-md-4">
+                <label>Lọc theo khóa học</label>
+                <select id="filterCourse" class="form-control">
+                    <option value="">-- Tất cả khóa học --</option>
+                    @if (courses != null)
+                    {
+                        foreach (var c in courses)
+                        {
+                            <option value="@c.Id">@c.Title</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label>Lọc theo MSSV</label>
+                <input type="text" id="filterMssv" class="form-control" placeholder="Nhập MSSV..." />
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="button" id="btnFilter" class="btn btn-secondary">
+                    <i class="fas fa-filter mr-1"></i> Lọc
+                </button>
+            </div>
+
+        </div>
+
+        <table id="items" class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+                    <th style="width: 10px">#</th>
+                    <th>MSSV</th>
+                    <th>Sinh viên</th>
+                    <th>Khóa học</th>
+                    <th style="width: 90px">Điểm</th>
+                    <th>Nhận xét</th>
+                    <th>Ngày chấm</th>
+                    <th style="width: 40px">Hành động</th>
+                </tr>
+
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- Modal thêm / sửa điểm -->
+
+<div class="modal fade" id="modal-default">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">
+                    @ViewBag.Title
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+
+                    <span aria-hidden="true">&times;</span>
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <form id="Item">
+
+                    <input type="hidden"
+                           id="Id"
+                           name="Id" />
+
+                    <div class="form-group">
+
+                        <label for="StudentId">
+                            Sinh viên
+                        </label>
+
+                        <select class="form-control"
+                                id="StudentId"
+                                name="StudentId">
+
+                            <option value="">-- Chọn sinh viên --</option>
+
+                            @if (students != null)
+                            {
+                                foreach (var s in students)
+                                {
+                                    <option value="@s.Id">@s.MSSV - @s.FullName</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="CourseId">
+                            Khóa học
+                        </label>
+
+                        <select class="form-control"
+                                id="CourseId"
+                                name="CourseId">
+
+                            <option value="">-- Chọn khóa học --</option>
+
+                            @if (courses != null)
+                            {
+                                foreach (var c in courses)
+                                {
+                                    <option value="@c.Id">@c.Title</option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="Score">
+                            Điểm (0 - 10)
+                        </label>
+
+                        <input type="number"
+                               class="form-control"
+                               id="Score"
+                               name="Score"
+                               step="0.1"
+                               min="0"
+                               max="10"
+                               value="0" />
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="Comment">
+                            Nhận xét
+                        </label>
+
+                        <textarea class="form-control"
+                                  id="Comment"
+                                  name="Comment"
+                                  rows="3"></textarea>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div class="modal-footer justify-content-between">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Đóng
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary btnSave">
+
+                    Lưu
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Css {
+
+    <link href="/plugins/datatables-bs4/css/datatables.bootstrap4.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/toastr/toastr.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/sweetalert2/sweetalert2.min.css"
+          rel="stylesheet" />
+
+    <style>
+        div.dt-buttons {
+            float: right;
+        }
+    </style>
+}
+
+
+@section Js {
+
+    <script src="/plugins/datatables/jquery.datatables.min.js"></script>
+
+    <script src="/plugins/datatables-bs4/js/datatables.bootstrap4.min.js"></script>
+
+    <script src="/plugins/datatables-buttons/js/datatables.buttons.min.js"></script>
+
+    <script src="/plugins/toastr/toastr.min.js"></script>
+
+    <script src="/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+
+
+    <script>
+
+        $(function () {
+
+            var items = $("#items").DataTable({
+
+                "dom": 'Blfrtip',
+
+                "processing": true,
+
+                "serverSide": true,
+
+
+                "ajax": {
+
+                    "url": "/Admin/Grade/getList",
+
+                    "data": function (d) {
+                        d.courseId = $("#filterCourse").val();
+                        d.mssv = $("#filterMssv").val();
+                    },
+
+                    "type": "POST",
+
+                    "dataType": "json",
+
+
+                    "error": function (xhr, error, code) {
+
+                        toastr.error(
+                            "Lỗi: Không thể tải danh sách điểm."
+                        );
+
+                    }
+
+                },
+
+
+                "columns": [
+
+                    {
+                        "data": null,
+
+                        "render": function (
+                            data,
+                            type,
+                            row,
+                            meta
+                        ) {
+
+                            return meta.row + 1;
+
+                        }
+
+                    },
+
+                    { "data": "mssv" },
+
+                    { "data": "fullName" },
+
+                    { "data": "courseTitle" },
+
+                    {
+                        "data": "score",
+                        "render": function (data) {
+                            var score = parseFloat(data);
+                            var cls = score >= 8 ? "badge-success" : (score >= 5 ? "badge-warning" : "badge-danger");
+                            return '<span class="badge ' + cls + '">' + score.toFixed(1) + '</span>';
+                        }
+                    },
+
+                    {
+                        "data": "comment",
+                        "render": function (data) {
+                            return data ? data : '<span class="text-muted">-</span>';
+                        }
+                    },
+
+                    { "data": "gradedAt" },
+
+
+                    {
+
+                        "render": function (
+                            data,
+                            type,
+                            row,
+                            meta
+                        ) {
+
+                            let tool =
+                                '<div class="btn-group">' +
+
+                                '<a href="#" ' +
+                                'data-toggle="dropdown" ' +
+                                'class="list-icons-item text-dark">' +
+
+                                '<i class="fas fa-sort-amount-down"></i>' +
+
+                                '</a>' +
+
+
+                                '<div class="dropdown-menu" role="menu">' +
+
+
+                                '<a class="dropdown-item text-primary btnEdit" ' +
+                                'href="#" ' +
+                                'data-id="' + row.id + '">' +
+
+                                '<i class="fas fa-pencil-alt mr-3"></i>' +
+                                'Cập nhật' +
+
+                                '</a>' +
+
+
+                                '<a class="dropdown-item text-danger btnDelete" ' +
+                                'href="#" ' +
+                                'data-id="' + row.id + '">' +
+
+                                '<i class="fas fa-trash mr-3"></i>' +
+                                'Xóa' +
+
+                                '</a>' +
+
+
+                                '</div>' +
+
+                                '</div>';
+
+
+                            return tool;
+
+                        }
+
+                    }
+
+                ],
+
+
+                "buttons": [
+
+                    {
+
+                        text:
+                            '<i class="fa fa-plus mr-2"></i>Thêm điểm',
+
+                        className:
+                            'btn btn-info pb-1',
+
+
+                        action: function (
+                            e,
+                            dt,
+                            node,
+                            config
+                        ) {
+
+                            $("#modal-default form#Item")[0].reset();
+
+                            $("#Id").val("");
+
+                            $("#modal-default").modal('show');
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
+
+            // Lọc theo khóa học / MSSV
+
+            $("#btnFilter").on("click", function () {
+                items.ajax.reload();
+            });
+
+
+            // Sửa điểm
+
+            $(document).on(
+                "click",
+                "a.btnEdit",
+                function () {
+
+                    let id = $(this).data("id");
+
+
+                    $.getJSON(
+                        "/Admin/Grade/getItem",
+                        {
+                            id: id
+                        },
+
+                        function (item) {
+
+                            $("#Id").val(item.id);
+
+                            $("#StudentId").val(item.studentId);
+
+                            $("#CourseId").val(item.courseId);
+
+                            $("#Score").val(item.score);
+
+                            $("#Comment").val(item.comment);
+
+
+                            $("#modal-default").modal('show');
+
+                        }
+
+                    ).fail(function () {
+
+                        toastr.error(
+                            "Không thể lấy thông tin điểm."
+                        );
+
+                    });
+
+                }
+            );
+
+
+            // Lưu điểm
+
+            $(".btnSave").on(
+                'click',
+                function () {
+
+                    if (!$("#StudentId").val()) {
+                        toastr.error("Vui lòng chọn sinh viên.");
+                        return;
+                    }
+
+                    if (!$("#CourseId").val()) {
+                        toastr.error("Vui lòng chọn khóa học.");
+                        return;
+                    }
+
+                    $.ajax({
+
+                        data: $("#Item").serialize(),
+
+                        url: "/Admin/Grade/Save",
+
+                        type: "POST",
+
+                        contentType:
+                            'application/x-www-form-urlencoded; charset=UTF-8',
+
+
+                        success: function (item) {
+
+                            $("#modal-default").modal('hide');
+
+                            toastr.success(
+                                "Lưu điểm thành công!"
+                            );
+
+                            items.ajax.reload();
+
+                        },
+
+
+                        error: function (xhr) {
+
+                            var msg = (xhr.responseJSON && typeof xhr.responseJSON === "string")
+                                ? xhr.responseJSON
+                                : (xhr.responseText || "Không thể lưu điểm.");
+
+                            toastr.error(msg);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            // Xóa điểm
+
+            $(document).on(
+                'click',
+                "a.btnDelete",
+                function () {
+
+                    let id = $(this).data("id");
+
+
+                    Swal.fire({
+
+                        title: 'Bạn chắc không?',
+
+                        text:
+                            "Xóa không thể phục hồi được!",
+
+                        showCancelButton: true,
+
+                        confirmButtonColor: '#d33',
+
+                        cancelButtonColor: '#3085d6',
+
+                        confirmButtonText: 'Xác nhận',
+
+                        cancelButtonText: 'Hủy'
+
+                    }).then(function (result) {
+
+                        if (result.isConfirmed) {
+
+                            $.get(
+                                "/Admin/Grade/Delete",
+                                {
+                                    id: id
+                                },
+
+                                function (data) {
+
+                                    if (data == true) {
+
+                                        toastr.success(
+                                            'Xóa điểm thành công.'
+                                        );
+
+                                        items.ajax.reload();
+
+                                    }
+                                    else {
+
+                                        toastr.error(
+                                            'Không thể xóa điểm.'
+                                        );
+
+                                    }
+
+                                }
+
+                            ).fail(function () {
+
+                                toastr.error(
+                                    "Không thể xóa điểm."
+                                );
+
+                            });
+
+                        }
+
+                    });
+
+                }
+            );
+
+        });
+
+    </script>
+}

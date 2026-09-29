@@ -1,0 +1,307 @@
+﻿@model IEnumerable<Web.Models.EF.Grade>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Báo cáo học tập";
+    var student = ViewBag.Student as Web.Models.EF.User;
+    var enrollments = ViewBag.Enrollments as IEnumerable<Web.Models.EF.Enrollment>;
+    double? average = ViewBag.AverageScore;
+    int totalLessons = ViewBag.TotalLessons ?? 0;
+    int passedCount = ViewBag.PassedCount ?? 0;
+    int failedCount = ViewBag.FailedCount ?? 0;
+    DateTime generatedAt = ViewBag.GeneratedAt ?? DateTime.Now;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Báo cáo học tập - E-Learning</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        .navbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 35px;
+        }
+
+        .nav-item {
+            margin-right: 25px;
+            font-size: 15px;
+            color: #334155;
+            text-decoration: none;
+        }
+
+            .nav-item:hover {
+                color: #2563eb;
+            }
+
+        .main {
+            padding: 35px 8%;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .page-sub {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .report-sheet {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .stat-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        table th {
+            color: #64748b;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .score-badge {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .score-good { background: #dcfce7; color: #15803d; }
+        .score-mid { background: #fef9c3; color: #a16207; }
+        .score-bad { background: #fee2e2; color: #b91c1c; }
+
+        .btn-main {
+            background: #2563eb;
+            border: none;
+        }
+
+            .btn-main:hover {
+                background: #1d4ed8;
+            }
+
+        @@media print {
+            .navbar, .no-print {
+                display: none !important;
+            }
+
+            .main {
+                padding: 0;
+            }
+
+            body {
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="/" class="logo">E-Learning</a>
+        <a href="/Course" class="nav-item">Chuyên mục</a>
+        <a asp-controller="Learning" asp-action="MyCourses" class="nav-item">Khóa học của tôi</a>
+        <a asp-controller="Learning" asp-action="Results" class="nav-item">Kết quả học tập</a>
+        <a asp-controller="Learning" asp-action="Schedule" class="nav-item">Lịch học</a>
+        <a asp-controller="Learning" asp-action="Documents" class="nav-item">Tài liệu</a>
+        <a asp-controller="Learning" asp-action="Report" class="nav-item" style="color:#2563eb;font-weight:bold;">Báo cáo</a>
+        <a asp-controller="Learning" asp-action="LookupScore" class="nav-item">Tra cứu điểm</a>
+        <div style="margin-left:auto;">
+            <span class="nav-item">@(student?.FullName ?? "Sinh viên")</span>
+            <a asp-controller="Account" asp-action="Logout" class="nav-item">Đăng xuất</a>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 no-print">
+            <div>
+                <div class="page-title">Báo cáo học tập</div>
+                <div class="page-sub">Tổng hợp toàn bộ quá trình học tập của bạn.</div>
+            </div>
+            <button onclick="window.print()" class="btn btn-main text-white px-4">🖨️ In báo cáo</button>
+        </div>
+
+        <div class="report-sheet">
+
+            <div class="report-header">
+                <div>
+                    <h4 class="fw-bold mb-1">BÁO CÁO KẾT QUẢ HỌC TẬP</h4>
+                    <div class="text-muted">Sinh viên: <strong>@(student?.FullName)</strong> — MSSV: @(student?.MSSV)</div>
+                    <div class="text-muted">Lớp: @(string.IsNullOrEmpty(student?.ClassName) ? "Chưa cập nhật" : student.ClassName)</div>
+                </div>
+                <div class="text-end text-muted small">
+                    Ngày xuất báo cáo:<br />
+                    @generatedAt.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">@(enrollments?.Count() ?? 0)</div>
+                        <div class="stat-label">Khóa học đã đăng ký</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">@totalLessons</div>
+                        <div class="stat-label">Tổng số bài học</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">@(average.HasValue ? average.Value.ToString("0.00") : "--")</div>
+                        <div class="stat-label">Điểm trung bình</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">@passedCount<span class="text-muted" style="font-size:16px;">/@(passedCount + failedCount)</span></div>
+                        <div class="stat-label">Môn đạt (≥ 5)</div>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="fw-bold mb-3">Chi tiết điểm số</h6>
+
+            @if (Model.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Khóa học</th>
+                            <th>Điểm</th>
+                            <th>Xếp loại</th>
+                            <th>Nhận xét</th>
+                            <th>Ngày chấm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int i = 1; }
+                        @foreach (var grade in Model)
+                        {
+                            var badgeClass = grade.Score >= 8 ? "score-good" : grade.Score >= 5 ? "score-mid" : "score-bad";
+                            var rank = grade.Score >= 8 ? "Giỏi" : grade.Score >= 6.5 ? "Khá" : grade.Score >= 5 ? "Trung bình" : "Chưa đạt";
+
+                            <tr>
+                                <td>@i</td>
+                                <td>@(grade.Course?.Title ?? "Khóa học")</td>
+                                <td><span class="score-badge @badgeClass">@grade.Score.ToString("0.##")</span></td>
+                                <td>@rank</td>
+                                <td>@(string.IsNullOrEmpty(grade.Comment) ? "-" : grade.Comment)</td>
+                                <td>@grade.GradedAt.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">Chưa có điểm nào được cập nhật để tổng hợp báo cáo.</p>
+            }
+
+            <h6 class="fw-bold mb-3 mt-4">Danh sách khóa học đã đăng ký</h6>
+
+            @if (enrollments != null && enrollments.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Khóa học</th>
+                            <th>Giảng viên</th>
+                            <th>Số bài học</th>
+                            <th>Ngày đăng ký</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in enrollments)
+                        {
+                            <tr>
+                                <td>@(e.Course?.Title ?? "Khóa học")</td>
+                                <td>@(e.Course?.Teacher?.FullName ?? "Chưa cập nhật")</td>
+                                <td>@(e.Course?.Lessons.Count ?? 0)</td>
+                                <td>@e.EnrolledAt.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">Bạn chưa đăng ký khóa học nào.</p>
+            }
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ============ AI TUTOR CHATBOT WIDGET ============ -->
+    @{
+        var tutorCtx = new ChatWidgetModel { ContextLabel = "Giải thích báo cáo học tập" };
+    }
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+</body>
+</html>

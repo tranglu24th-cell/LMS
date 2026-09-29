@@ -1,0 +1,121 @@
+﻿@model IEnumerable<Core.Database.Models.Contact>
+
+@{
+    ViewBag.Title = "Quản lý Góp Ý";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+
+    string RoleLabel(string? role) => role switch
+    {
+        "Teacher" => "Giảng viên",
+        "Student" => "Học viên",
+        "Admin" => "Quản trị viên",
+        _ => "Khách"
+    };
+
+    string RoleBadgeClass(string? role) => role switch
+    {
+        "Teacher" => "badge-warning",
+        "Student" => "badge-info",
+        "Admin" => "badge-dark",
+        _ => "badge-secondary"
+    };
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark" style="font-weight: 600;">Góp Ý giữa Học Viên & Giảng Viên</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Danh sách góp ý</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Người gửi</th>
+                            <th>Vai trò</th>
+                            <th>Khóa học</th>
+                            <th>Nội dung góp ý</th>
+                            <th>Ngày gửi</th>
+                            <th>Phản hồi</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int stt = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    <strong class="text-dark">@item.Name</strong><br />
+                                    <a href="mailto:@item.Email" class="text-muted" style="font-size: 12px;">@item.Email</a>
+                                </td>
+                                <td>
+                                    <span class="badge @RoleBadgeClass(item.SenderRole)">@RoleLabel(item.SenderRole)</span>
+                                </td>
+                                <td>
+                                    @if (item.Course != null)
+                                    {
+                                        <span class="text-dark">@item.Course.Title</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Góp ý chung</span>
+                                    }
+                                </td>
+                                <td>@item.Message</td>
+                                <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td style="min-width: 220px;">
+                                    <form action="/Admin/Contact/Reply" method="post" class="d-flex align-items-center">
+                                        <input type="hidden" name="Id" value="@item.Id" />
+                                        <div class="input-group">
+                                            <input type="text" name="AdminReply" class="form-control form-control-sm"
+                                                   placeholder="Nhập nội dung phản hồi..." value="@item.AdminReply" required />
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-paper-plane"></i> Gửi
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    @if (!string.IsNullOrEmpty(item.AdminReply))
+                                    {
+                                        <div class="mt-1">
+                                            <small class="text-success">
+                                                <i class="fa fa-check-circle"></i>
+                                                Đã trả lời bởi
+                                                <span class="badge @RoleBadgeClass(item.RepliedByRole)" style="font-size: 10px;">@RoleLabel(item.RepliedByRole)</span>
+                                                lúc @item.RepliedAt?.ToString("dd/MM/yyyy HH:mm")
+                                            </small>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <form action="/Admin/Contact/Delete" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa góp ý này không?');">
+                                        <input type="hidden" name="Id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fa fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

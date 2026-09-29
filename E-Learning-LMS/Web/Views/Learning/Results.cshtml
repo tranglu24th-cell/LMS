@@ -1,0 +1,261 @@
+﻿@model IEnumerable<Web.Models.EF.Grade>
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Kết quả học tập";
+    var student = ViewBag.Student as Web.Models.EF.User;
+    var enrollments = ViewBag.Enrollments as IEnumerable<Web.Models.EF.Enrollment>;
+    double? average = ViewBag.AverageScore;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Kết quả học tập - E-Learning</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        .navbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 35px;
+        }
+
+        .nav-item {
+            margin-right: 25px;
+            font-size: 15px;
+            color: #334155;
+            text-decoration: none;
+        }
+
+            .nav-item:hover {
+                color: #2563eb;
+            }
+
+        .main {
+            padding: 35px 8%;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .page-sub {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        .panel h5 {
+            font-weight: bold;
+            margin-bottom: 18px;
+        }
+
+        table th {
+            color: #64748b;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .score-badge {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .score-good { background: #dcfce7; color: #15803d; }
+        .score-mid { background: #fef9c3; color: #a16207; }
+        .score-bad { background: #fee2e2; color: #b91c1c; }
+
+        .empty-box {
+            background: white;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .progress {
+            height: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="/" class="logo">E-Learning</a>
+        <a href="/Course" class="nav-item">Chuyên mục</a>
+        <a asp-controller="Learning" asp-action="MyCourses" class="nav-item">Khóa học của tôi</a>
+        <a asp-controller="Learning" asp-action="Results" class="nav-item" style="color:#2563eb;font-weight:bold;">Kết quả học tập</a>
+        <a asp-controller="Learning" asp-action="Schedule" class="nav-item">Lịch học</a>
+        <a asp-controller="Learning" asp-action="Documents" class="nav-item">Tài liệu</a>
+        <a asp-controller="Learning" asp-action="Report" class="nav-item">Báo cáo</a>
+        <a asp-controller="Learning" asp-action="LookupScore" class="nav-item">Tra cứu điểm</a>
+        <div style="margin-left:auto;">
+            <span class="nav-item">@(student?.FullName ?? "Sinh viên")</span>
+            <a asp-controller="Account" asp-action="Logout" class="nav-item">Đăng xuất</a>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <div class="page-title">Kết quả học tập</div>
+        <div class="page-sub">Theo dõi tiến độ và điểm số của bạn qua từng khóa học.</div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-number">@(enrollments?.Count() ?? 0)</div>
+                    <div class="stat-label">Khóa học đã đăng ký</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-number">@(Model?.Count() ?? 0)</div>
+                    <div class="stat-label">Số cột điểm đã có</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-number">@(average.HasValue ? average.Value.ToString("0.00") : "--")</div>
+                    <div class="stat-label">Điểm trung bình</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+                <div class="panel">
+                    <h5>Tiến độ khóa học</h5>
+
+                    @if (enrollments != null && enrollments.Any())
+                    {
+                        foreach (var e in enrollments)
+                        {
+                            var course = e.Course;
+                            if (course == null) { continue; }
+                            var lessonCount = course.Lessons?.Count ?? 0;
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <strong>@course.Title</strong>
+                                    <span class="text-muted small">@lessonCount bài học</span>
+                                </div>
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-primary" role="progressbar"
+                                         style="width: @(lessonCount > 0 ? 100 : 0)%"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Bạn chưa đăng ký khóa học nào.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel">
+                    <h5>Bảng điểm</h5>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Khóa học</th>
+                                    <th>Điểm</th>
+                                    <th>Ngày chấm</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var grade in Model)
+                                {
+                                    var badgeClass = grade.Score >= 8 ? "score-good" : grade.Score >= 5 ? "score-mid" : "score-bad";
+                                    <tr>
+                                        <td>@(grade.Course?.Title ?? "Khóa học")</td>
+                                        <td><span class="score-badge @badgeClass">@grade.Score.ToString("0.##")</span></td>
+                                        <td>@grade.GradedAt.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-box">
+                            Chưa có điểm nào được cập nhật.
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ============ AI TUTOR CHATBOT WIDGET ============ -->
+    @{
+        var tutorCtx = new ChatWidgetModel { ContextLabel = "Giải thích kết quả & cách cải thiện" };
+    }
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+</body>
+</html>

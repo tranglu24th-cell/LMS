@@ -1,0 +1,1028 @@
+﻿@model IEnumerable<Web.Models.EF.User>
+
+@{
+    ViewBag.Title = "Giảng viên";
+    Layout = "~/Areas/Admin/Views/Shared/_Admin.cshtml";
+}
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h1 class="card-title mb-0">
+            @ViewBag.Title
+        </h1>
+
+        <button type="button"
+                class="btn btn-primary ml-auto"
+                data-toggle="modal"
+                data-target="#modal-add-teacher">
+            <i class="fas fa-plus"></i>
+            Thêm giảng viên
+        </button>
+
+    </div>
+
+    <div class="card-body table-responsive">
+
+        <table id="items" class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+                    <th style="width: 10px">#</th>
+                    <th>Họ tên</th>
+                    <th>Tài khoản Gmail</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Số khóa học</th>
+                    <th>Ngày đăng ký</th>
+                    <th style="width: 150px">Hành động</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var teacher in Model)
+                {
+                    <tr>
+
+                        <td></td>
+
+                        <td>
+                            <strong>@teacher.FullName</strong>
+                        </td>
+
+                        <td>
+                            <strong>@teacher.Username</strong>
+                        </td>
+
+                        <td>
+                            <span class="badge badge-success">
+                                @teacher.Role
+                            </span>
+                        </td>
+
+                        <td>
+                            @if (teacher.IsActive)
+                            {
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    Đang hoạt động
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-lock"></i>
+                                    Đã khóa
+                                </span>
+                            }
+                        </td>
+
+                        <td>
+                            @{
+                                var courseCounts = ViewBag.CourseCounts as Dictionary<Guid, int>;
+                                var courseCount = courseCounts != null &&
+                                courseCounts.TryGetValue(teacher.Id, out var count)
+                                ? count
+                                : 0;
+                            }
+
+                            <span class="badge badge-info">
+                                @courseCount
+                            </span>
+                        </td>
+
+                        <td>
+                            @teacher.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+
+                        <td>
+
+                            <div class="btn-group">
+
+                                <a href="#"
+                                   data-toggle="dropdown"
+                                   class="list-icons-item text-dark">
+                                    <i class="fas fa-sort-amount-down"></i>
+                                </a>
+
+                                <div class="dropdown-menu" role="menu">
+
+                                    <!-- Xem chi tiết -->
+                                    <a class="dropdown-item text-info btnDetail"
+                                       href="#"
+                                       data-id="@teacher.Id">
+                                        <i class="fas fa-eye mr-3"></i>
+                                        Xem chi tiết
+                                    </a>
+
+                                    <!-- Cập nhật -->
+                                    <a class="dropdown-item text-primary btnEdit"
+                                       href="#"
+                                       data-id="@teacher.Id">
+                                        <i class="fas fa-pencil-alt mr-3"></i>
+                                        Cập nhật
+                                    </a>
+
+                                    <!-- Khóa / mở khóa -->
+                                    <a class="dropdown-item btnToggleActive @(teacher.IsActive ? "text-warning" : "text-success")"
+                                       href="#"
+                                       data-id="@teacher.Id"
+                                       data-active="@teacher.IsActive">
+
+                                        <i class="fas @(teacher.IsActive ? "fa-lock" : "fa-unlock") mr-3"></i>
+
+                                        @(teacher.IsActive
+                                            ? "Khóa tài khoản"
+                                            : "Mở khóa")
+                                    </a>
+
+                                    <!-- Xóa -->
+                                    <a class="dropdown-item text-danger btnDelete"
+                                       href="#"
+                                       data-id="@teacher.Id">
+
+                                        <i class="fas fa-trash mr-3"></i>
+                                        Xóa
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- MODAL THÊM GIẢNG VIÊN -->
+<!-- ===================================================== -->
+
+<div class="modal fade" id="modal-add-teacher">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">
+                    Thêm giảng viên
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group">
+
+                    <label>
+                        Họ tên
+                    </label>
+
+                    <input type="text"
+                           id="add-fullname"
+                           class="form-control"
+                           placeholder="Nhập họ tên giảng viên" />
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Gmail
+                    </label>
+
+                    <input type="email"
+                           id="add-email"
+                           class="form-control"
+                           placeholder="Ví dụ: gv.nguyenvana@gmail.com" />
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Mật khẩu
+                    </label>
+
+                    <input type="password"
+                           id="add-password"
+                           class="form-control"
+                           placeholder="Nhập mật khẩu đăng nhập" />
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal">
+
+                    Đóng
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="btnSaveAddTeacher">
+
+                    <i class="fas fa-user-plus"></i>
+                    Thêm giảng viên
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- ===================================================== -->
+<!-- MODAL XEM CHI TIẾT -->
+<!-- ===================================================== -->
+
+<div class="modal fade" id="modal-detail-teacher">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">
+                    Chi tiết giảng viên
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+
+                        <strong>Họ tên:</strong>
+
+                        <span id="detail-fullname">
+                            ---
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <strong>Gmail:</strong>
+
+                        <span id="detail-username">
+                            ---
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+
+                        <strong>Vai trò:</strong>
+
+                        <span id="detail-role"
+                              class="badge badge-success">
+                            ---
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <strong>Số khóa học:</strong>
+
+                        <span id="detail-course-count"
+                              class="badge badge-info">
+                            0
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <hr />
+
+                <h5>
+                    Danh sách khóa học
+                </h5>
+
+                <div id="detail-courses">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODAL CẬP NHẬT -->
+<!-- ===================================================== -->
+
+<div class="modal fade" id="modal-edit-teacher">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">
+                    Cập nhật giảng viên
+                </h4>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="edit-id" />
+
+
+                <div class="form-group">
+
+                    <label>
+                        Họ tên
+                    </label>
+
+                    <input type="text"
+                           id="edit-fullname"
+                           class="form-control"
+                           placeholder="Nhập họ tên" />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Gmail
+                    </label>
+
+                    <input type="email"
+                           id="edit-username"
+                           class="form-control"
+                           placeholder="Nhập Gmail" />
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Mật khẩu
+                    </label>
+
+                    <input type="password"
+                           id="edit-password"
+                           class="form-control"
+                           placeholder="Để trống nếu không đổi" />
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal">
+
+                    Đóng
+
+                </button>
+
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="btnSaveEdit">
+
+                    <i class="fas fa-save"></i>
+
+                    Lưu thay đổi
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Css {
+
+    <link href="/plugins/datatables-bs4/css/datatables.bootstrap4.min.css"
+          rel="stylesheet" />
+
+    <link href="/plugins/toastr/toastr.min.css"
+          rel="stylesheet" />
+
+    <style>
+
+        div.dt-buttons {
+            float: right;
+        }
+
+    </style>
+}
+
+
+@section Js {
+
+    <script src="/plugins/datatables/jquery.datatables.min.js"></script>
+
+    <script src="/plugins/datatables-bs4/js/datatables.bootstrap4.min.js"></script>
+
+    <script src="/plugins/toastr/toastr.min.js"></script>
+
+    <script src="/plugins/moment/moment.min.js"></script>
+
+
+    <script>
+
+        // =====================================================
+        // DATATABLE
+        // =====================================================
+
+        $(function () {
+
+            $("#items").DataTable({
+
+                "dom": 'Blfrtip',
+
+                "processing": true,
+
+                "language": {
+
+                    "search": "Tìm kiếm:",
+
+                    "lengthMenu": "Hiển thị _MENU_ dòng",
+
+                    "info": "Hiển thị _START_ đến _END_ trong tổng số _TOTAL_ giảng viên",
+
+                    "infoEmpty": "Không có giảng viên",
+
+                    "zeroRecords": "Không tìm thấy giảng viên"
+
+                },
+
+                "columnDefs": [
+
+                    {
+                        "targets": 0,
+
+                        "render": function (data, type, row, meta) {
+
+                            return meta.row + 1;
+
+                        }
+                    }
+
+                ]
+
+            });
+
+        });
+
+
+        // =====================================================
+        // XEM CHI TIẾT
+        // =====================================================
+
+        $(document).on('click', '.btnDetail', function (e) {
+
+            e.preventDefault();
+
+            var id = $(this).data('id');
+
+
+            $.ajax({
+
+                url: '/Admin/Course/GetTeacher',
+
+                type: 'GET',
+
+                data: {
+                    id: id
+                },
+
+
+                success: function (result) {
+
+                    $('#detail-fullname')
+                        .text(result.fullName || '---');
+
+                    $('#detail-username')
+                        .text(result.username || '---');
+
+                    $('#detail-role')
+                        .text(result.role || '---');
+
+                    $('#detail-course-count')
+                        .text(result.courseCount || 0);
+
+
+                    var html = '';
+
+
+                    if (result.courses &&
+                        result.courses.length > 0) {
+
+                        html += '<div class="list-group">';
+
+
+                        result.courses.forEach(function (course) {
+
+                            html += `
+
+                                <div class="list-group-item">
+
+                                    <strong>
+                                        ${course.title}
+                                    </strong>
+
+                                    <small class="text-muted float-right">
+
+                                        ${moment(course.createdAt)
+                                            .format('DD/MM/YYYY')}
+
+                                    </small>
+
+                                </div>
+
+                            `;
+
+                        });
+
+
+                        html += '</div>';
+
+                    }
+                    else {
+
+                        html = `
+
+                            <div class="alert alert-info">
+
+                                Giảng viên chưa có khóa học nào.
+
+                            </div>
+
+                        `;
+
+                    }
+
+
+                    $('#detail-courses')
+                        .html(html);
+
+
+                    $('#modal-detail-teacher')
+                        .modal('show');
+
+                },
+
+
+                error: function () {
+
+                    toastr.error(
+                        'Không thể tải thông tin giảng viên.'
+                    );
+
+                }
+
+            });
+
+        });
+
+
+        // =====================================================
+        // CẬP NHẬT GIẢNG VIÊN - MỞ MODAL
+        // =====================================================
+
+        $(document).on('click', '.btnEdit', function (e) {
+
+            e.preventDefault();
+
+            var id = $(this).data('id');
+
+
+            $.ajax({
+
+                url: '/Admin/Course/GetItem',
+
+                type: 'GET',
+
+                data: {
+                    id: id
+                },
+
+
+                success: function (result) {
+
+                    $('#edit-id')
+                        .val(result.id);
+
+                    $('#edit-fullname')
+                        .val(result.fullName || '');
+
+                    $('#edit-username')
+                        .val(result.username || '');
+
+                    $('#edit-password')
+                        .val('');
+
+
+                    $('#modal-edit-teacher')
+                        .modal('show');
+
+                },
+
+
+                error: function () {
+
+                    toastr.error(
+                        'Không thể tải thông tin giảng viên.'
+                    );
+
+                }
+
+            });
+
+        });
+
+
+        // =====================================================
+        // LƯU THAY ĐỔI GIẢNG VIÊN
+        // =====================================================
+
+        $(document).on('click', '#btnSaveEdit', function (e) {
+
+            e.preventDefault();
+
+
+            var id = $('#edit-id').val();
+
+            var fullName = $('#edit-fullname').val();
+
+            var username = $('#edit-username').val();
+
+            var password = $('#edit-password').val();
+
+
+            if (!username.trim()) {
+
+                toastr.error(
+                    'Gmail không được để trống.'
+                );
+
+                return;
+
+            }
+
+
+            $.ajax({
+
+                url: '/Admin/Course/Edit',
+
+                type: 'POST',
+
+                data: {
+
+                    Id: id,
+
+                    FullName: fullName,
+
+                    Username: username,
+
+                    Password: password
+
+                },
+
+
+                success: function (result) {
+
+                    toastr.success(
+                        'Cập nhật giảng viên thành công.'
+                    );
+
+
+                    $('#modal-edit-teacher')
+                        .modal('hide');
+
+
+                    setTimeout(function () {
+
+                        location.reload();
+
+                    }, 700);
+
+                },
+
+
+                error: function (xhr) {
+
+                    var message =
+                        xhr.responseText ||
+                        'Không thể cập nhật giảng viên.';
+
+
+                    toastr.error(message);
+
+                }
+
+            });
+
+        });
+        // =====================================================
+// THÊM GIẢNG VIÊN
+// =====================================================
+
+$(document).on('click', '#btnSaveAddTeacher', function (e) {
+
+    e.preventDefault();
+
+    var fullName = $('#add-fullname').val().trim();
+    var email = $('#add-email').val().trim();
+    var password = $('#add-password').val();
+
+
+    if (!fullName) {
+
+        toastr.error('Vui lòng nhập họ tên giảng viên.');
+
+        return;
+    }
+
+
+    if (!email) {
+
+        toastr.error('Vui lòng nhập Gmail.');
+
+        return;
+    }
+
+
+    if (!password) {
+
+        toastr.error('Vui lòng nhập mật khẩu.');
+
+        return;
+    }
+
+
+    $.ajax({
+
+        url: '/Admin/Course/Create',
+
+        type: 'POST',
+
+        data: {
+
+            FullName: fullName,
+
+            Email: email,
+
+            Username: email,
+
+            Password: password
+
+        },
+
+
+        success: function (result) {
+
+            toastr.success(
+                'Tạo tài khoản giảng viên thành công.'
+            );
+
+
+            $('#modal-add-teacher')
+                .modal('hide');
+
+
+            setTimeout(function () {
+
+                location.reload();
+
+            }, 700);
+
+        },
+
+
+        error: function (xhr) {
+
+            var message =
+                xhr.responseText ||
+                'Không thể tạo tài khoản giảng viên.';
+
+
+            toastr.error(message);
+
+        }
+
+    });
+
+});
+
+        // =====================================================
+        // XÓA GIẢNG VIÊN
+        // =====================================================
+
+        $(document).on('click', '.btnDelete', function (e) {
+
+            e.preventDefault();
+
+            var id = $(this).data('id');
+
+
+            if (!confirm(
+                'Bạn có chắc muốn xóa giảng viên này?'
+            )) {
+
+                return;
+
+            }
+
+
+            $.ajax({
+
+                url: '/Admin/Course/Delete',
+
+                type: 'POST',
+
+                data: {
+                    id: id
+                },
+
+
+                success: function () {
+
+                    toastr.success(
+                        'Xóa giảng viên thành công.'
+                    );
+
+
+                    setTimeout(function () {
+
+                        location.reload();
+
+                    }, 700);
+
+                },
+
+
+                error: function (xhr) {
+
+                    var message =
+                        xhr.responseText ||
+                        'Không thể xóa giảng viên.';
+
+
+                    toastr.error(message);
+
+                }
+
+            });
+
+        });
+
+
+        // =====================================================
+        // KHÓA / MỞ KHÓA GIẢNG VIÊN
+        // =====================================================
+
+        $(document).on('click', '.btnToggleActive', function (e) {
+
+            e.preventDefault();
+
+
+            var id = $(this).data('id');
+
+            var isActive = $(this).data('active');
+
+
+            var message = isActive
+
+                ? 'Bạn có chắc muốn khóa tài khoản giảng viên này?'
+
+                : 'Bạn có chắc muốn mở khóa tài khoản giảng viên này?';
+
+
+            if (!confirm(message)) {
+
+                return;
+
+            }
+
+
+            $.ajax({
+
+                url: '/Admin/Course/ToggleActive',
+
+                type: 'POST',
+
+                data: {
+                    id: id
+                },
+
+
+                success: function (result) {
+
+                    if (result.isActive) {
+
+                        toastr.success(
+                            'Đã mở khóa tài khoản giảng viên.'
+                        );
+
+                    }
+                    else {
+
+                        toastr.warning(
+                            'Đã khóa tài khoản giảng viên.'
+                        );
+
+                    }
+
+
+                    setTimeout(function () {
+
+                        location.reload();
+
+                    }, 700);
+
+                },
+
+
+                error: function (xhr) {
+
+                    var message =
+                        xhr.responseText ||
+                        'Không thể thay đổi trạng thái tài khoản.';
+
+
+                    toastr.error(message);
+
+                }
+
+            });
+
+        });
+
+    </script>
+}

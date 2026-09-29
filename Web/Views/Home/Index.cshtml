@@ -1,0 +1,468 @@
+﻿@model IEnumerable<Web.Models.EF.Course>
+
+@{
+    ViewData["Title"] = "E-Learning";
+    var isEn = Context.Request.Cookies["lang"] == "en";
+}
+
+<style>
+
+    /* ================================
+           HOME PAGE
+           ================================ */
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #f5f7fb;
+        font-family: Arial, sans-serif;
+        color: #1e293b;
+    }
+
+
+    /* ================================
+           HERO
+           ================================ */
+
+    .hero {
+        background: linear-gradient(135deg, #eef4ff, #ffffff);
+        padding: 80px 8%;
+    }
+
+    .hero-content {
+        max-width: 700px;
+    }
+
+    .hero h1 {
+        font-size: 45px;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+
+    .hero p {
+        color: #64748b;
+        font-size: 18px;
+        margin-top: 20px;
+        line-height: 1.7;
+    }
+
+    .btn-main {
+        display: inline-block;
+        background: #2563eb;
+        color: white;
+        padding: 13px 28px;
+        border-radius: 7px;
+        text-decoration: none;
+        margin-top: 20px;
+    }
+
+        .btn-main:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+
+    /* ================================
+           SECTION
+           ================================ */
+
+    .section {
+        padding: 60px 8%;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .section-title h2 {
+            font-weight: bold;
+        }
+
+        .section-title p {
+            color: #64748b;
+        }
+
+
+    /* ================================
+           FEATURES
+           ================================ */
+
+    .feature-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 30px;
+        height: 100%;
+        text-align: center;
+    }
+
+    .feature-icon {
+        font-size: 40px;
+        margin-bottom: 20px;
+    }
+
+    .feature-card h4 {
+        font-weight: bold;
+    }
+
+    .feature-card p {
+        color: #64748b;
+    }
+
+
+    /* ================================
+           COURSE
+           ================================ */
+
+    .course-section {
+        background: white;
+    }
+
+    .course-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 25px;
+        height: 100%;
+        transition: 0.2s;
+    }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+    .course-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 10px;
+        background: #eef4ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+
+    .course-card h4 {
+        font-weight: bold;
+    }
+
+    .course-card p {
+        color: #64748b;
+    }
+
+
+    /* ================================
+           RESPONSIVE
+           ================================ */
+
+    @@media (max-width: 768px) {
+
+        .hero {
+            padding: 60px 20px;
+        }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+        .section {
+            padding: 45px 20px;
+        }
+
+        .feature-card {
+            padding: 25px;
+        }
+
+        .course-card {
+            padding: 22px;
+        }
+    }
+
+</style>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            @(isEn ? "Welcome to" : "Chào mừng bạn đến với")
+            <span style="color:#2563eb;">
+                E-Learning
+            </span>
+        </h1>
+
+        <p>
+
+            @if (isEn)
+            {
+                @:An online learning platform for students.
+                @:Explore courses, study and track your
+                @:results on a single platform.
+            }
+            else
+            {
+                @:Hệ thống học tập trực tuyến dành cho sinh viên.
+                @:Khám phá các khóa học, học tập và theo dõi kết quả
+                @:của bạn trên một nền tảng duy nhất.
+            }
+
+        </p>
+
+        <a href="/Lesson" class="btn-main">
+            @(isEn ? "Explore courses" : "Khám phá khóa học")
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CHỨC NĂNG ================= -->
+
+<section class="section">
+
+    <div class="section-title">
+
+        <h2>
+            Hệ thống học tập
+        </h2>
+
+        <p>
+            Mọi thứ bạn cần cho quá trình học tập trực tuyến
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- KHÓA HỌC -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📚
+                </div>
+
+                <h4>
+                    Khóa học
+                </h4>
+
+                <p>
+                    Xem và tìm kiếm các khóa học đang được cung cấp.
+                </p>
+
+                <a href="/Lesson"
+                   class="btn btn-outline-primary">
+
+                    Xem khóa học
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- KHÓA HỌC CỦA TÔI -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🎓
+                </div>
+
+                <h4>
+                    Khóa học của tôi
+                </h4>
+
+                <p>
+                    Theo dõi những khóa học bạn đã đăng ký.
+                </p>
+
+                <a asp-controller="Learning"
+                   asp-action="MyCourses"
+                   class="btn btn-outline-primary">
+
+                    Xem khóa học
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- KẾT QUẢ HỌC TẬP -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📊
+                </div>
+
+                <h4>
+                    Kết quả học tập
+                </h4>
+
+                <p>
+                    Theo dõi tiến độ và kết quả học tập của bạn.
+                </p>
+
+                <a asp-controller="Learning"
+                   asp-action="Results"
+                   class="btn btn-outline-primary">
+
+                    Xem kết quả
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRA CỨU ĐIỂM -->
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🔍
+                </div>
+
+                <h4>
+                    Tra cứu điểm
+                </h4>
+
+                <p>
+                    Tra cứu điểm và thông tin học tập.
+                </p>
+
+                <a asp-controller="Learning"
+                   asp-action="LookupScore"
+                   class="btn btn-outline-primary">
+
+                    Tra cứu
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= KHÓA HỌC ================= -->
+
+<section class="section course-section">
+
+    <div class="section-title">
+
+        <h2>
+            Khóa học nổi bật
+        </h2>
+
+        <p>
+            Bắt đầu học ngay hôm nay
+        </p>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        @if (Model != null && Model.Any())
+        {
+
+            foreach (var course in Model)
+            {
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="course-card">
+
+                        <div class="course-icon">
+                            📚
+                        </div>
+
+                        <h4>
+                            @course.Title
+                        </h4>
+
+                        <p>
+                            @(course.Description ??
+                                                "Chưa có mô tả cho khóa học này.")
+                                                                              </p>
+
+                        <p>
+
+                            <strong>
+                                Giảng viên:
+                            </strong>
+
+                            @(course.Teacher?.Username ??
+                                                "Chưa cập nhật")
+
+                </p>
+
+                        <a href="/Lesson/Details/@course.Id"
+                           class="btn btn-primary">
+
+                            Xem khóa học
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                }
+
+        }
+        else
+        {
+
+            <div class="col-12 text-center">
+
+                <p class="text-muted">
+                    Hiện chưa có khóa học nào.
+                </p>
+
+            </div>
+
+        }
+
+    </div>
+
+</section>
+
+
+<!-- ================= AI TUTOR ================= -->
+@{
+    var tutorCtx = new ChatWidgetModel
+    {
+        ContextLabel = "Hỏi về khái niệm trong bài học"
+    };
+}
+
+@await Html.PartialAsync("_AiTutorWidget", tutorCtx)

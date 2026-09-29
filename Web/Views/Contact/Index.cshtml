@@ -1,0 +1,144 @@
+﻿@model IEnumerable<Core.Database.Models.Contact>
+@using System.Security.Claims
+@{
+    ViewBag.Title = "Góp Ý";
+    Layout = "~/Views/Shared/_Site.cshtml";
+
+    bool isLoggedIn = User.Identity?.IsAuthenticated == true;
+    string? myRole = isLoggedIn ? User.FindFirst(ClaimTypes.Role)?.Value : null;
+    string? myId = isLoggedIn ? User.FindFirst(ClaimTypes.NameIdentifier)?.Value : null;
+
+    string RoleLabel(string? role) => role switch
+    {
+        "Teacher" => "Giảng viên",
+        "Student" => "Học viên",
+        "Admin" => "Quản trị viên",
+        _ => "Khách"
+    };
+
+    string RoleBadgeClass(string? role) => role switch
+    {
+        "Teacher" => "bg-warning text-dark",
+        "Student" => "bg-primary",
+        "Admin" => "bg-dark",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="container-fluid contact py-6 wow bounceInUp" data-wow-delay="0.1s">
+    <div class="container">
+        <div class="p-5 bg-light rounded font-text">
+            <div class="row g-4">
+
+                <div class="col-lg-6">
+                    <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">GÓP Ý & TRAO ĐỔI</small>
+                    <h1 class="display-5 mb-4">Học Viên & Giảng Viên Cùng Trao Đổi!</h1>
+                    <p class="mb-4">Nơi học viên và giảng viên góp ý, giải đáp thắc mắc cho nhau về khóa học, bài giảng hoặc quá trình học tập.</p>
+
+                    @if (TempData["ContactError"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["ContactError"]</div>
+                    }
+
+                    @if (isLoggedIn)
+                    {
+                        <form asp-action="Index" method="post">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <span class="badge @RoleBadgeClass(myRole) p-2 mb-2">
+                                        <i class="fa fa-user"></i> Gửi với vai trò: @RoleLabel(myRole) — @User.Identity!.Name
+                                    </span>
+                                </div>
+                                <div class="col-12">
+                                    <select name="CourseId" class="form-select border-primary p-3">
+                                        <option value="">-- Góp ý chung (không gắn khóa học) --</option>
+                                        @foreach (var course in (IEnumerable<Web.Models.EF.Course>)ViewBag.Courses)
+                                        {
+                                            <option value="@course.Id">@course.Title</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <textarea name="Message" class="w-100 form-control border-primary p-3" rows="5" placeholder="Nội dung góp ý của bạn..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button class="btn btn-primary w-100 py-3 rounded-pill" type="submit">Gửi Góp Ý</button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="text-center p-4 bg-white rounded border">
+                            <p class="mb-3">Bạn cần đăng nhập bằng tài khoản học viên hoặc giảng viên để gửi và trả lời góp ý.</p>
+                            <a class="btn btn-primary rounded-pill px-4" href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Index", "Contact") })">Đăng nhập ngay</a>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-lg-6">
+                    <h4 class="mb-4 text-dark" style="font-weight: 600;">Các góp ý gần đây</h4>
+
+                    <div style="max-height: 500px; overflow-y: auto; padding-right: 5px;">
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <div class="card mb-3 shadow-sm bg-white" style="border-radius: 15px; border: 1px solid #e3e6f0;">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0 text-primary" style="font-weight: bold;">
+                                                @item.Name
+                                                <span class="badge @RoleBadgeClass(item.SenderRole) ms-1" style="font-size: .7rem;">@RoleLabel(item.SenderRole)</span>
+                                            </h5>
+                                            <small class="text-muted"><i class="fa fa-calendar-alt"></i> @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                        </div>
+
+                                        @if (item.Course != null)
+                                        {
+                                            <small class="d-inline-block mb-2 text-secondary"><i class="fa fa-book"></i> Khóa học: <strong>@item.Course.Title</strong></small>
+                                        }
+
+                                        <p class="card-text text-dark">@item.Message</p>
+
+                                        @if (!string.IsNullOrEmpty(item.AdminReply))
+                                        {
+                                            <div class="p-3 bg-light rounded mt-3" style="border-left: 4px solid #2563eb;">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <small class="fw-bold text-dark">
+                                                        <i class="fa fa-reply"></i> Phản hồi từ
+                                                        <span class="badge @RoleBadgeClass(item.RepliedByRole)" style="font-size: .65rem;">@RoleLabel(item.RepliedByRole)</span>
+                                                    </small>
+                                                    <small class="text-muted">@item.RepliedAt?.ToString("dd/MM/yyyy HH:mm")</small>
+                                                </div>
+                                                <p class="mb-0 text-secondary" style="font-style: italic;">@item.AdminReply</p>
+                                            </div>
+                                        }
+                                        else if (isLoggedIn)
+                                        {
+                                            <form asp-action="Reply" method="post" class="mt-3">
+                                                <input type="hidden" name="Id" value="@item.Id" />
+                                                <div class="input-group">
+                                                    <input type="text" name="ReplyMessage" class="form-control" placeholder="Viết câu trả lời..." required />
+                                                    <button class="btn btn-outline-primary" type="submit"><i class="fa fa-reply"></i> Trả lời</button>
+                                                </div>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted italic">Chưa có góp ý nào. Hãy là người đầu tiên chia sẻ!</p>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Js {
+}

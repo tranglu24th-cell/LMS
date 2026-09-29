@@ -1,0 +1,168 @@
+﻿@model Web.Models.EF.User
+
+@{
+    ViewData["Title"] = "Cài đặt tài khoản";
+    Layout = "~/Views/Shared/_Site.cshtml";
+    var success = TempData["SettingsSuccess"] as string;
+    var error = TempData["SettingsError"] as string;
+}
+
+<div class="container mt-5 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <h3 class="fw-bold mb-1">Cài đặt tài khoản</h3>
+            <p class="text-muted mb-4">Quản lý thông tin cá nhân và bảo mật tài khoản của bạn.</p>
+
+            @if (!string.IsNullOrEmpty(success))
+            {
+                <div class="alert alert-success">@success</div>
+            }
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+
+            <!-- CẬP NHẬT THÔNG TIN -->
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-person-lines-fill me-2"></i>
+                    Thông tin cá nhân
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-controller="Account" asp-action="UpdateProfile" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">MSSV</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" value="@Model.MSSV" disabled />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" value="@Model.Email" disabled />
+                                <div class="form-text">Email/MSSV không thể thay đổi. Liên hệ quản trị viên nếu cần cập nhật.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Họ và tên</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="fullName" class="form-control" value="@Model.FullName" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Lớp</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="className" class="form-control" value="@Model.ClassName" />
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- ĐỔI MẬT KHẨU -->
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-shield-lock me-2"></i>
+                    Đổi mật khẩu
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-controller="Account" asp-action="ChangePassword" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Mật khẩu hiện tại</label>
+                            <div class="col-sm-9">
+                                <input type="password" name="currentPassword" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Mật khẩu mới</label>
+                            <div class="col-sm-9">
+                                <input type="password" name="newPassword" class="form-control" minlength="6" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-form-label">Xác nhận mật khẩu mới</label>
+                            <div class="col-sm-9">
+                                <input type="password" name="confirmPassword" class="form-control" minlength="6" required />
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary px-4">Đổi mật khẩu</button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- NGÔN NGỮ -->
+            <div class="card shadow-sm border-0 mb-4">
+
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-translate me-2"></i>
+                    Ngôn ngữ hiển thị
+                </div>
+
+                <div class="card-body p-4">
+
+                    <p class="text-muted mb-3">Chọn ngôn ngữ bạn muốn hiển thị trên thanh điều hướng.</p>
+
+                    <div class="btn-group" role="group">
+                        <a href="@Url.Action("SetLanguage", "Account", new { lang = "vi", returnUrl = Url.Action("Settings", "Account") })"
+                           class="btn btn-outline-primary @(Context.Request.Cookies["lang"] != "en" ? "active" : "")">
+                            🇻🇳 Tiếng Việt
+                        </a>
+                        <a href="@Url.Action("SetLanguage", "Account", new { lang = "en", returnUrl = Url.Action("Settings", "Account") })"
+                           class="btn btn-outline-primary @(Context.Request.Cookies["lang"] == "en" ? "active" : "")">
+                            🇬🇧 English
+                        </a>
+                    </div>
+
+                    <div class="form-text mt-2">
+                        Hiện tại bản dịch tiếng Anh mới áp dụng cho thanh điều hướng và trang chủ. Nội dung khóa học vẫn hiển thị bằng tiếng Việt.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="text-center">
+                <a href="/" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                    Quay lại trang chủ
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

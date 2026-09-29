@@ -1,0 +1,157 @@
+﻿@model Web.Models.EF.User
+
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    Layout = "~/Views/Shared/_Site.cshtml";
+}
+
+<div class="container mt-5 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-header text-white text-center"
+                     style="background:#34495e; padding:25px;">
+
+                    <div style="
+                        width:80px;
+                        height:80px;
+                        border-radius:50%;
+                        background:white;
+                        color:#34495e;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        margin:0 auto 15px;
+                        font-size:32px;
+                        font-weight:bold;">
+
+                        @(Model.FullName?.Substring(0, 1).ToUpper() ?? "U")
+
+                    </div>
+
+                    <h4 class="mb-1">Thông Tin Cá Nhân</h4>
+
+                    <div style="opacity:.85;">
+                        Sinh viên E-Learning
+                    </div>
+
+                </div>
+
+
+                <div class="card-body p-4">
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 fw-bold">
+                            <i class="bi bi-person me-2"></i>
+                            Họ và tên:
+                        </label>
+
+                        <div class="col-sm-8">
+                            @Model.FullName
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 fw-bold">
+                            <i class="bi bi-card-text me-2"></i>
+                            Mã số sinh viên:
+                        </label>
+
+                        <div class="col-sm-8 text-primary fw-bold">
+                            @Model.MSSV
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 fw-bold">
+                            <i class="bi bi-envelope me-2"></i>
+                            Email:
+                        </label>
+
+                        <div class="col-sm-8">
+                            @Model.Email
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 fw-bold">
+                            <i class="bi bi-person-badge me-2"></i>
+                            Tên đăng nhập:
+                        </label>
+
+                        <div class="col-sm-8">
+                            @Model.Username
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-4 fw-bold">
+                            <i class="bi bi-mortarboard me-2"></i>
+                            Lớp:
+                        </label>
+
+                        <div class="col-sm-8">
+                            @Model.ClassName
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3 row">
+
+                        <label class="col-sm-4 fw-bold">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Trạng thái:
+                        </label>
+
+                        <div class="col-sm-8">
+
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">
+                                    Đang hoạt động
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Đã bị khóa
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <p class="text-muted small text-center mb-0">
+                        Thông tin cá nhân được quản lý trên hệ thống E-Learning.
+                    </p>
+
+                </div>
+
+
+                <div class="card-footer text-center bg-white p-3">
+
+                    <a href="/" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i>
+                        Quay lại trang chủ
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

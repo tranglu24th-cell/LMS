@@ -1,0 +1,107 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Điểm phong trào";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Điểm phong trào - E-Learning</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        .main {
+            padding: 40px 8%;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .page-sub {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f5f9;
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 35px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main">
+
+        <div class="page-title">Điểm phong trào</div>
+
+        <div class="page-sub">
+            Thông tin điểm các hoạt động và phong trào của sinh viên.
+        </div>
+
+        <div class="panel">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên phong trào</th>
+                        <th>Ngày</th>
+                        <th>Địa điểm</th>
+                        <th>Ký tên</th>
+                        <th>Điểm số</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="empty">
+                            Chưa có dữ liệu điểm phong trào.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

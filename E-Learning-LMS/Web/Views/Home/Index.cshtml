@@ -1,0 +1,832 @@
+﻿@model IEnumerable<Web.Models.EF.Course>
+@{
+    ViewData["Title"] = "E-Learning";
+    Layout = null;
+    var isEn = Context.Request.Cookies["lang"] == "en";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>E-Learning</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar-custom {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 45px;
+        }
+
+        .nav-link-custom {
+            text-decoration: none;
+            color: #334155;
+            font-size: 15px;
+            margin-right: 30px;
+        }
+
+            .nav-link-custom:hover {
+                color: #2563eb;
+            }
+
+        .account-area {
+            margin-left: auto;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            background: linear-gradient(135deg, #eef4ff, #ffffff);
+            padding: 80px 8%;
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero h1 {
+            font-size: 45px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            color: #64748b;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .btn-main {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 13px 28px;
+            border-radius: 7px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+
+            .btn-main:hover {
+                background: #1d4ed8;
+                color: white;
+            }
+
+        /* ================= FEATURES ================= */
+
+        .section {
+            padding: 60px 8%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+            .section-title h2 {
+                font-weight: bold;
+            }
+
+            .section-title p {
+                color: #64748b;
+            }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 30px;
+            height: 100%;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h4 {
+            font-weight: bold;
+        }
+
+        .feature-card p {
+            color: #64748b;
+        }
+
+        /* ================= COURSE ================= */
+
+        .course-section {
+            background: white;
+        }
+
+        .course-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 25px;
+            height: 100%;
+            transition: 0.2s;
+        }
+
+            .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            }
+
+        .course-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            background: #eef4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            margin-bottom: 20px;
+        }
+
+        .course-card h4 {
+            font-weight: bold;
+        }
+
+        .course-card p {
+            color: #64748b;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #172033;
+            color: white;
+            padding: 30px 8%;
+            text-align: center;
+        }
+
+            footer p {
+                margin: 0;
+                color: #cbd5e1;
+            }
+
+        /* ================= RESPONSIVE ================= */
+
+        @@media (max-width: 768px) {
+
+            .navbar-custom {
+                height: auto;
+                padding: 20px;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                margin-right: 20px;
+            }
+
+            .nav-link-custom {
+                margin-top: 10px;
+                margin-right: 15px;
+            }
+
+            .account-area {
+                margin-left: 0;
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+        }
+        /* ================= ACCOUNT MENU ================= */
+
+        .account-area {
+            margin-left: auto;
+            position: relative;
+        }
+
+        .account-dropdown {
+            position: relative;
+        }
+
+        .account-button {
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px 8px;
+            color: #1e293b;
+            font-size: 15px;
+        }
+
+            .account-button:hover {
+                color: #2563eb;
+            }
+
+        .account-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #34495e;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .account-name {
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .account-arrow {
+            font-size: 12px;
+        }
+
+
+        /* MENU SỔ XUỐNG */
+
+        .account-menu {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            width: 295px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            padding: 8px 0;
+            display: none;
+            z-index: 99999;
+        }
+
+            .account-menu.show {
+                display: block;
+            }
+
+
+        /* TỪNG DÒNG */
+
+        .account-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            height: 55px;
+            padding: 0 25px;
+            text-decoration: none;
+            color: #111827;
+            font-size: 16px;
+        }
+
+            .account-menu-item:hover {
+                background: #f5f7fb;
+                color: #2563eb;
+            }
+
+            .account-menu-item i:first-child {
+                width: 22px;
+                font-size: 20px;
+                text-align: center;
+                color: #111827;
+            }
+
+            .account-menu-item:hover i:first-child {
+                color: #2563eb;
+            }
+
+
+        /* ĐƯỜNG KẺ */
+
+        .account-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 7px 0;
+        }
+
+
+        /* MŨI TÊN LANGUAGE */
+
+        .language-arrow {
+            margin-left: auto;
+            font-size: 11px !important;
+        }
+
+
+        /* ĐĂNG XUẤT */
+
+        .logout-item:hover {
+            background: #fff1f1;
+            color: #dc2626;
+        }
+
+            .logout-item:hover i {
+                color: #dc2626 !important;
+            }
+
+
+        /* CHƯA ĐĂNG NHẬP */
+
+        .account-login-link {
+            text-decoration: none;
+            color: #334155;
+            font-size: 15px;
+        }
+
+            .account-login-link:hover {
+                color: #2563eb;
+            }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar-custom">
+
+        <a href="/" class="logo">
+            E-Learning
+        </a>
+
+        <a href="/" class="nav-link-custom">
+            @(isEn ? "Home" : "Trang chủ")
+        </a>
+
+        <a href="/Course" class="nav-link-custom">
+            @(isEn ? "Categories" : "Chuyên mục")
+        </a>
+
+        <a asp-controller="Learning" asp-action="MyCourses" class="nav-link-custom">
+            @(isEn ? "My Courses" : "Khóa học của tôi")
+        </a>
+
+        <a asp-controller="Learning" asp-action="Results" class="nav-link-custom">
+            @(isEn ? "My Results" : "Kết quả học tập")
+        </a>
+
+        <a asp-controller="Learning" asp-action="LookupScore" class="nav-link-custom">
+            @(isEn ? "Score Lookup" : "Tra cứu điểm")
+        </a>
+
+        <div class="account-area">
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="account-dropdown">
+
+                    <!-- NÚT TÀI KHOẢN -->
+                    <button type="button"
+                            class="account-button"
+                            id="accountButton">
+
+                        <span class="account-avatar">
+                            @(User.Identity.Name?.Substring(0, 1).ToUpper() ?? "U")
+                        </span>
+
+                        <span class="account-name">
+                            @User.Identity.Name
+                        </span>
+
+                        <i class="bi bi-chevron-down account-arrow"></i>
+
+                    </button>
+
+
+                    <!-- MENU SỔ XUỐNG -->
+                    <div class="account-menu" id="accountMenu">
+
+                        <!-- PROFILE -->
+                        <a asp-controller="Account"
+                           asp-action="Profile"
+                           class="account-menu-item">
+
+                            <i class="bi bi-person"></i>
+
+                            <span>@(isEn ? "Profile" : "Hồ sơ")</span>
+
+                        </a>
+
+
+                        <!-- GRADES -->
+                        <a asp-controller="Learning"
+                           asp-action="Results"
+                           class="account-menu-item">
+
+                            <i class="bi bi-file-earmark-text"></i>
+
+                            <span>@(isEn ? "My Results" : "Kết quả học tập")</span>
+
+                        </a>
+
+
+                        <!-- CALENDAR -->
+                        <a asp-controller="Learning"
+                           asp-action="Schedule"
+                           class="account-menu-item">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            <span>@(isEn ? "Schedule" : "Lịch học")</span>
+
+                        </a>
+
+
+                        <!-- PRIVATE FILES -->
+                        <a asp-controller="Learning"
+                           asp-action="Documents"
+                           class="account-menu-item">
+
+                            <i class="bi bi-folder-plus"></i>
+
+                            <span>@(isEn ? "My Documents" : "Tài liệu cá nhân")</span>
+
+                        </a>
+
+
+                        <!-- REPORTS -->
+                        <a asp-controller="Learning"
+                           asp-action="Report"
+                           class="account-menu-item">
+
+                            <i class="bi bi-file-text"></i>
+
+                            <span>@(isEn ? "Academic Report" : "Báo cáo học tập")</span>
+
+                        </a>
+
+
+                        <div class="account-divider"></div>
+
+
+                        <!-- PREFERENCES -->
+                        <a asp-controller="Account"
+                           asp-action="Settings"
+                           class="account-menu-item">
+
+                            <i class="bi bi-sliders"></i>
+
+                            <span>@(isEn ? "Settings" : "Cài đặt")</span>
+
+                        </a>
+
+
+                        <!-- LANGUAGE -->
+                        <div class="account-menu-item" style="cursor:default;">
+
+                            <i class="bi bi-translate"></i>
+
+                            <span>@(isEn ? "Language" : "Ngôn ngữ")</span>
+
+                            <span style="margin-left:auto; display:flex; gap:6px;">
+                                <a href="@Url.Action("SetLanguage", "Account", new { lang = "vi", returnUrl = Url.Action("Index", "Home") })"
+                                   style="font-size:12px; padding:2px 8px; border-radius:6px; text-decoration:none; @(!isEn ? "background:#2563eb;color:#fff;" : "background:#f1f5f9;color:#334155;")">VI</a>
+                                <a href="@Url.Action("SetLanguage", "Account", new { lang = "en", returnUrl = Url.Action("Index", "Home") })"
+                                   style="font-size:12px; padding:2px 8px; border-radius:6px; text-decoration:none; @(isEn ? "background:#2563eb;color:#fff;" : "background:#f1f5f9;color:#334155;")">EN</a>
+                            </span>
+
+                        </div>
+
+
+                        <div class="account-divider"></div>
+
+
+                        <!-- ĐĂNG XUẤT -->
+                        <a asp-controller="Account"
+                           asp-action="Logout"
+                           class="account-menu-item logout-item">
+
+                            <i class="bi bi-box-arrow-right"></i>
+
+                            <span>@(isEn ? "Log out" : "Đăng xuất")</span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <!-- CHƯA ĐĂNG NHẬP -->
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="account-login-link">
+
+                    Tài khoản
+
+                </a>
+            }
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                @(isEn ? "Welcome to" : "Chào mừng bạn đến với")
+                <span style="color:#2563eb;">
+                    E-Learning
+                </span>
+            </h1>
+
+            <p>
+                @if (isEn)
+                {
+                    @:An online learning platform for students.
+                    @:Explore courses, study and track your
+                    @:results on a single platform.
+                }
+                else
+                {
+                    @:Hệ thống học tập trực tuyến dành cho sinh viên.
+                    @:Khám phá các khóa học, học tập và theo dõi kết quả
+                    @:của bạn trên một nền tảng duy nhất.
+                }
+            </p>
+
+            <a href="/Course" class="btn-main">
+                @(isEn ? "Explore courses" : "Khám phá khóa học")
+            </a>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= CHỨC NĂNG ================= -->
+
+    <section class="section">
+
+        <div class="section-title">
+
+            <h2>
+                Hệ thống học tập
+            </h2>
+
+            <p>
+                Mọi thứ bạn cần cho quá trình học tập trực tuyến
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        📚
+                    </div>
+
+                    <h4>
+                        Khóa học
+                    </h4>
+
+                    <p>
+                        Xem và tìm kiếm các khóa học đang được cung cấp.
+                    </p>
+
+                    <a href="/Course"
+                       class="btn btn-outline-primary">
+                        Xem khóa học
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        🎓
+                    </div>
+
+                    <h4>
+                        Khóa học của tôi
+                    </h4>
+
+                    <p>
+                        Theo dõi những khóa học bạn đã đăng ký.
+                    </p>
+
+                    <a asp-controller="Learning" asp-action="MyCourses"
+                       class="btn btn-outline-primary">
+                        Xem khóa học
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        📊
+                    </div>
+
+                    <h4>
+                        Kết quả học tập
+                    </h4>
+
+                    <p>
+                        Theo dõi tiến độ và kết quả học tập của bạn.
+                    </p>
+
+                    <a asp-controller="Learning" asp-action="Results"
+                       class="btn btn-outline-primary">
+                        Xem kết quả
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        🔍
+                    </div>
+
+                    <h4>
+                        Tra cứu điểm
+                    </h4>
+
+                    <p>
+                        Tra cứu điểm và thông tin học tập.
+                    </p>
+
+                    <a asp-controller="Learning" asp-action="LookupScore"
+                       class="btn btn-outline-primary">
+                        Tra cứu
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= KHÓA HỌC ================= -->
+
+    <section class="section course-section">
+
+        <div class="section-title">
+
+            <h2>
+                Khóa học nổi bật
+            </h2>
+
+            <p>
+                Bắt đầu học ngay hôm nay
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @if (Model != null && Model.Any())
+            {
+                foreach (var course in Model)
+                {
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="course-card">
+
+                            <div class="course-icon">
+                                📚
+                            </div>
+
+                            <h4>
+                                @course.Title
+                            </h4>
+
+                            <p>
+                                @(course.Description ?? "Chưa có mô tả cho khóa học này.")
+                            </p>
+
+                            <p>
+                                <strong>Giảng viên:</strong>
+                                @(course.Teacher?.Username ?? "Chưa cập nhật")
+                            </p>
+
+                            <a href="/Course/Details/@course.Id"
+                               class="btn btn-primary">
+                                Xem khóa học
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+
+                    <p class="text-muted">
+                        Hiện chưa có khóa học nào.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 E-Learning - Hệ thống học tập trực tuyến
+        </p>
+
+    </footer>
+    <script>
+
+        const accountButton = document.getElementById("accountButton");
+        const accountMenu = document.getElementById("accountMenu");
+
+        if (accountButton && accountMenu) {
+
+            accountButton.addEventListener("click", function (event) {
+
+                event.stopPropagation();
+
+                accountMenu.classList.toggle("show");
+
+            });
+
+            document.addEventListener("click", function () {
+
+                accountMenu.classList.remove("show");
+
+            });
+
+        }
+
+    </script>
+
+    <!-- ============ AI TUTOR CHATBOT WIDGET ============ -->
+    @{
+        var tutorCtx = new ChatWidgetModel { ContextLabel = "Hỏi về khái niệm trong bài học" };
+    }
+    @await Html.PartialAsync("_AiTutorWidget", tutorCtx)
+
+</body>
+</html>
